@@ -1,0 +1,50 @@
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+body {
+  color: slateblue;
+  text-align: center;
+  max-width: 72%;
+  margin: auto;
+}
+h1 {
+  color: black;
+}
+h3 {
+  color: deeppink;
+}
+a {
+  text-decoration: none;
+}
+
+.bio{
+  color: gray;
+}
+.my-img {
+  border-radius: 50%;
+  max-height: 200px;
+  margin: auto;
+  display: block;
+}
+.experience {
+  border-bottom: solid deeppink 1px;
+}
+.formation{
+  border-bottom: solid deeppink 1px;
+}
+
+.languages-driving{
+  overflow: hidden;
+}
+.languagesParent {
+  float: left;
+}
+.languages {
+  float: left;
+  margin: 30px;
+}
+.driving {
+  float: right;
+}
+#material-icons-driving {
+  transform: scale(4);
+  margin: 53px;
+}
