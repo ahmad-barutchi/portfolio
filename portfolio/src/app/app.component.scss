@@ -1,11 +1,17 @@
 
+.component-class {
+  // background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('../../assets/images/bg2.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .nav-button {
   float: right;
   background-color: slateblue;
   color: white;
   padding: 10px 20px;
   margin-right: 10px;
-  margin-top: 10px;
+  margin-top: 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;

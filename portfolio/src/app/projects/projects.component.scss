@@ -1,4 +1,34 @@
-body {
+.body-class {
   color: slateblue;
   text-align: center;
+  max-width: 72%;
+  margin: auto;
+}
+
+h1 {
+  color: black;
+}
+h3 {
+  color: deeppink;
+}
+img {
+  width: 1080px;
+}
+
+.border-divisor {
+  margin: auto;
+  width: 50%;
+  border-bottom: solid black 1px;
+}
+.border-divisor-big {
+  border-bottom: solid deeppink 3px;
+}
+
+#icon_hackathon {
+  transform: scale(2);
+  margin-right: 30px;
+}
+#icon_tfe {
+  transform: scale(2);
+  margin-right: 30px;
 }
