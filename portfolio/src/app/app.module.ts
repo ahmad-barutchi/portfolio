@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { ContactComponent } from './contact/contact.component';
+import {ActivitiesComponent} from "./activities/activities.component";
+
 
 @NgModule({
   declarations: [
@@ -20,6 +22,7 @@ import { ContactComponent } from './contact/contact.component';
     ProjectsComponent,
     FooterComponent,
     ContactComponent,
+    ActivitiesComponent
   ],
   imports: [
     BrowserModule,

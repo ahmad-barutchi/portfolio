@@ -1,0 +1,58 @@
+.body-class {
+  color: slateblue;
+  text-align: center;
+  max-width: 72%;
+  margin: auto;
+}
+
+h1 {
+  color: black;
+}
+h2 {
+  color: gray;
+}
+h3 {
+  color: deeppink;
+}
+h5 {
+  color: black;
+}
+img {
+  width: 100%;
+}
+.img-small {
+  width: 26%;
+  margin-right: 9px;
+  margin-left: 9px;
+}
+.title-color {
+  color: deeppink;
+}
+.icon {
+  width: 24px;
+  margin-right: 5px;
+}
+.icon-mongo {
+  width: 40px;
+  margin-right: 5px;
+}
+
+.border-divisor {
+  margin: 20px auto 20px auto;
+  width: 40%;
+  border-bottom: solid black 1px;
+}
+.border-divisor-mid {
+  margin: 20px auto 20px auto;
+  width: 70%;
+  border-bottom: solid aqua 3px;
+}
+.border-divisor-big {
+  margin: 20px;
+  border-bottom: solid deeppink 5px;
+}
+
+#icon_tfe {
+  transform: scale(2);
+  margin-right: 30px;
+}

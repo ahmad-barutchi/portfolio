@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {Router} from "@angular/router";
+import {TfeComponent} from "./activities/tfe/tfe.component";
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,10 @@ export class AppComponent {
   }
   goToProjects() {
     this.router.navigate(['/projects']);
+    this.changeBg();
+  }
+  goToActivities() {
+    this.router.navigate(['/activities']);
     this.changeBg();
   }
   goToAbout() {

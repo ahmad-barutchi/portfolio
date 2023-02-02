@@ -1,0 +1,121 @@
+
+<div class="body-class">
+  <h1><span id="icon_tfe" class="material-icons">analytics</span>Travail de fin d'études (2022)</h1>
+  <h2>Prototypage d’un robot secouriste</h2>
+  <div class="border-divisor"></div>
+
+  <h3>Technologies utiliseés: </h3>
+  <h4><img class="icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/115px-Python-logo-notext.svg.png?20220821155029">
+    <b class="title-color">Python</b> Frameworks: Flask, PyMongo, JWT, UnitTest</h4>
+
+  <h4><img class="icon" src="https://angular.io/assets/images/logos/angular/angular.svg">
+    <b class="title-color">Angular 13+</b> Basé sur le template Ngx-admin</h4>
+
+  <h4><img class="icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Arduino_Logo.svg/720px-Arduino_Logo.svg.png">
+    <b class="title-color">Arduino</b> Un module pour contrôler le robot (Robotics)</h4>
+
+  <h4><img class="icon" src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg">
+  <b class="title-color">Swagger</b> Pour documenter l'API de Flask</h4>
+
+  <h4><img class="icon-mongo" src="https://webimages.mongodb.com/_com_assets/cms/kuyjf3vea2hg34taa-horizontal_default_slate_blue.svg">
+    <b class="title-color">MongoDB</b> Base de données</h4>
+
+  <div class="border-divisor"></div>
+
+  <h3>Résumé</h3>
+  <h4>Le but du projet est la mise en oeuvre du robot et d'une application web et mobile
+    pour la surveillance (monitoring) des données générer par le robot (IOT).</h4>
+  <h4>L'application est basé sur le template de monitoring Ngx-Admin</h4>
+
+  <br><div class="border-divisor-big"></div><br><br>
+
+
+  <h1>Fonctionnement</h1>
+  <h2>Partie Software</h2>
+
+  <div class="border-divisor-mid"></div>
+
+  <h3>Ngx-admin</h3>
+  <h4>Afin de développer notre application web, il a été important de réfléchir aux outils, framework
+    à utiliser. Il existe plusieurs solutions de monitoring avec lesquelles nous pouvons travailler et développer notre propre solution.
+    Afin de ne pas réinventer la roue, Akveo propose des tableaux de bord d’administrateur qui vont nous permettre de faire du monitoring
+    de données et du big data, nous aurons la possibilité d’implémenter n’importe quel type de composants à notre tableau de bord. <br>
+    Ngx-admin est un modèle Angular créer par Akveo, ce tableau de bord très connu est open
+    source et gratuit. Il est construit sur Angular 13+ en prenant en charge Eva Design System et Nebular.</h4>
+
+  <div class="border-divisor"></div>
+
+
+  <h3>Gestion utilisateur</h3>
+  <h4>Afin d’accéder au dashboard qui donne accès aux données des séances de recherche du robot,
+    l’utilisateur arrivera dans un premier temps sur une page de login/register comme ci-contre</h4>
+  <img src="https://i.imgur.com/3GJAfyn.png">
+
+  <h4>Les administrateurs a un affichage personnalisé, qui le différencie des utilisateurs clients,
+    les mots de passe dans la base de données MongoDB sont haché avec SHA-256 et SHA-512, voici un example</h4>
+  <img src="https://i.imgur.com/96GXP5M.png">
+
+  <div class="border-divisor"></div>
+
+  <h3>Visualisation</h3>
+  <h4>Ceci est un graphe pour comparer les valeurs prise par le robot
+    (témperature avant, témperature arrière, témperature ambiante, et la humidité)
+    ainsi que les courbes de prédiction d'une présance vivante ou d'un potentiel source de feu/innondation. <br>
+    les boutons coloré sert à filtrer/supprimer un courbe pour mieux visualiser les autres.</h4>
+  <img src="https://i.imgur.com/DbPLA27.png">
+
+  <h4>Les données sont affichées également dans un tableau pour permetre de faire des recherche par catégories ou valeurs.
+    Afin de savoir directement si nous avons la présence d’un être humain ou d’un feu directement
+    sans devoir faire une analyse par graphique nous centralisons les informations dans un tableau. <br><br>
+    L’utilisateur doit principalement se concentrer sur la colonne « Origin » afin de vérifier s’il
+    s’agit d’un être humain ou d’un feu, toute la logique est en place dans le Backend. Ensuite, il
+    lui suffit de regarder la position GPS, de regarder l’heure de détection et enfin d’analyser les
+    probabilités. Une probabilité plus élevée devra être prise en charge en priorité des autres détections</h4>
+  <img src="https://i.imgur.com/FVy2Jz7.png">
+
+  <h4>dans cette example nous pouvons manipuler les différents séances ou les supprimer</h4>
+  <img src="https://i.imgur.com/hJnMUAJ.png">
+
+  <div class="border-divisor"></div>
+
+  <h3>JWT</h3>
+  <h4>JWT ou Json Web Token est de plus en plus populaire pour sécuriser les API. voici un exemple d'une réponse ayant un token JWT
+    que l'utlisateur doit inclure dans ses requête pour verifier leur identité sur le serveur.</h4>
+  <img src="https://i.imgur.com/NvnJufF.png">
+
+  <div class="border-divisor"></div>
+
+  <h3>Swagger</h3>
+  <h4>Swagger nous a permis de décrire la structure de notre API <br>
+    Voici un aperçu de toutes nos routes sur Swagger</h4>
+  <img src="https://i.imgur.com/UsNfTMB.png">
+
+  <h4>Nous pouvons voir l’URL de la requête dans le champ « Request URL » et le champ « Curl » qui
+    exécute la requête. On peut apercevoir une réponse en JSON avec le code 200 ainsi qu’une
+    description qui nous spécifie que le test de la requête est fonctionnel. <br>
+    par exemple pour tester notre route POST "/login"
+  </h4>
+  <img src="https://i.imgur.com/Ijt8tmP.png">
+
+  <div class="border-divisor"></div>
+
+  <h3>Application Mobile</h3>
+  <h4>à l'aide du framework Capacitor, nous avons généré une application android. <br>
+    Capacitor est un moteur d'exécution native multiplateforme permettant de créer des applications
+    web modernes qui peuvent facilement s'exécuter en mode natif sur iOS ou Android. <br>
+    dans le graphe nous somme capable d'agrandir l'échelle de temps (zoom). <br>
+    voici un aperçu de l'application android:
+  </h4>
+  <img class="img-small" src="https://i.imgur.com/zFGTGOa.png">
+  <img class="img-small" src="https://i.imgur.com/iBNJ47Y.png">
+  <img class="img-small" src="https://i.imgur.com/YqBqYde.png">
+
+  <div class="border-divisor-big"></div>
+
+  <h2>Partie Hardware</h2>
+  <div class="border-divisor-mid"></div>
+  <h3>Schema robot électrique</h3>
+  <img src="https://i.imgur.com/KNOxrqa.png">
+
+  <p>Ce projet a été réalisé en binôme en utilisant la méthode agile Kanban pour distribuer les tâches, par Ahmad Barutchi et Younes Zahouane.</p>
+</div>

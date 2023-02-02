@@ -1,7 +1,8 @@
+
 <div class="body-class">
-  <img alt="Avatar" class="my-img" src="./assets/images/Ahmad%20Barutchi.jpg">
+  <img alt="Avatar - Ahmad Barutchi" class="my-img" src="./assets/images/Ahmad%20Barutchi.jpg">
   <h1>Ahmad Barutchi</h1>
-  <h2>Développeur en Informatique junior</h2>
+  <h2> <span id="icon_dev" class="material-icons">developer_mode</span> Développeur en Informatique junior</h2>
 
   <mat-icon>phone</mat-icon> 0472 813 831 <br>
   <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2RYeN56EvozwyyxYGDw4dTu-pbUZyNxnF93zSLUcOlQ&s">
@@ -11,13 +12,13 @@
 
   <h3 class="bio">
     Âgé de 28 ans, je suis diplomé en bachelier informatique et Systèmes,
-    orientation Réseaux et Télécommunications (option développement).
+    orientation Réseaux et Télécommunications <br> de la Haute école en Hainaut.
   </h3>
 
 
   <div class="languages-driving">
     <div class="languagesParent">
-      <h2 class="LanguageTitle"><span class="material-icons">language</span>Langues</h2>
+      <h1 class="LanguageTitle"><span id="icon_language"  class="material-icons">language</span>Langues</h1>
       <div class="languages">
         <mat-progress-spinner color="primary" mode="determinate" value="98"></mat-progress-spinner>
         <h3>Français</h3>
@@ -33,7 +34,7 @@
     </div>
 
     <div class="driving">
-      <h2>Permis de conduire</h2>
+      <h1>Permis de conduire</h1>
       <span id="material_icons_driving" class="material-icons">
       directions_car
       </span>
@@ -109,4 +110,34 @@
     <h3>LOGICIELS</h3>
     <h4>Git, Docker, IntelliJ IDEA, Android Studio, MySQL, PostgreSQL</h4>
   </div>
+
+
 </div>
+
+<div class="transition-pic">
+  <div class="portrait" id="portrait">
+    <div class="fill cover-img"></div>
+    <div class="fill z-10 hover">
+      <div class="fill cover-img hover-img"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var root = document.getElementById('portrait');
+
+  var mouse_monitor = function(e) {
+    let x = e.clientX/innerWidth;
+    let y = e.clientY/innerHeight;
+
+    let move_x = (x>0.5) ? '-30px' : '30px';
+    let move_y = (y>0.5) ? '-20px' : '20px';
+
+    root.style.setProperty("--translate-x", move_x);
+    root.style.setProperty("--translate-y", move_y);
+  }
+
+  root.addEventListener("mousemove", mouse_monitor);
+
+
+</script>
