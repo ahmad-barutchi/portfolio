@@ -10,6 +10,6 @@ export class ActivitiesComponent {
   constructor(private router: Router) { }
 
   goToTfe() {
-    this.router.navigate(['tfe']);
+    this.router.navigate(['activities/tfe']);
   }
 }

@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'about', component: AboutComponent },
   { path: 'activities', component: ActivitiesComponent },
-  { path: 'tfe', component: TfeComponent },
+  { path: 'activities/tfe', component: TfeComponent },
   { path: '**', redirectTo: '/home' }
 ];
 

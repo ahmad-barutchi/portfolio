@@ -12,28 +12,15 @@ h3 {
   color: deeppink;
 }
 img {
-  width: 80%;
+  width: 90%;
   max-height: 199px;
 }
-
-.border-divisor {
-  margin: auto;
-  width: 50%;
-  border-bottom: solid black 1px;
-}
-.border-divisor-big {
-  border-bottom: solid deeppink 3px;
+.icon {
+  transform: scale(2);
+  margin-right: 20px;
 }
 
-#icon_hackathon {
-  transform: scale(2);
-  margin-right: 30px;
-}
-#icon_tfe {
-  transform: scale(2);
-  margin-right: 30px;
-}
-#link {
+.link {
   cursor: pointer;
 }
 .margin-extend {
@@ -42,16 +29,14 @@ img {
 
 
 
-
-
+// animations
 
 .clickable {
   cursor: pointer;
-
 }
 .carre_couleur
 {
-  width:70%;
+  width: 38%;
   height: 200px;
   display: inline-block;
   position: relative;

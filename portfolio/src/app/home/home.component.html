@@ -2,13 +2,13 @@
 <div class="body-class">
   <img alt="Avatar - Ahmad Barutchi" class="my-img" src="./assets/images/Ahmad%20Barutchi.jpg">
   <h1>Ahmad Barutchi</h1>
-  <h2> <span id="icon_dev" class="material-icons">developer_mode</span> Développeur en Informatique junior</h2>
+  <h2> <span class="material-icons icon-dev">developer_mode</span> Développeur en Informatique junior</h2>
 
   <mat-icon>phone</mat-icon> 0472 813 831 <br>
   <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2RYeN56EvozwyyxYGDw4dTu-pbUZyNxnF93zSLUcOlQ&s">
   <a href="https://www.linkedin.com/in/ahmad-barutchi-b5b035114/" class="icon">Ahmad Barutchi</a><br>
   <mat-icon>mail</mat-icon> ahmad.barutchi@gmail.com <br>
-  <mat-icon>home</mat-icon> Rue du Gouvernement 54, 7000 MONS, Belgique. <br>
+  <mat-icon>home</mat-icon> Rue du Gouvernement 54, 7000 MONS, Belgique.
 
   <h3 class="bio">
     Âgé de 28 ans, je suis diplomé en bachelier informatique et Systèmes,
@@ -18,7 +18,7 @@
 
   <div class="languages-driving">
     <div class="languagesParent">
-      <h1 class="LanguageTitle"><span id="icon_language"  class="material-icons">language</span>Langues</h1>
+      <h1 class="LanguageTitle"><span class="material-icons icon-i">language</span>Langues</h1>
       <div class="languages">
         <mat-progress-spinner color="primary" mode="determinate" value="98"></mat-progress-spinner>
         <h3>Français</h3>
@@ -35,16 +35,15 @@
 
     <div class="driving">
       <h1>Permis de conduire</h1>
-      <span id="material_icons_driving" class="material-icons">
-      directions_car
-      </span>
-      <h3>(B) depuis 2014</h3>
+      <span class="material-icons material-icons-driving">directions_car</span><h3>(B) depuis 2014</h3>
     </div>
   </div>
 
 
-  <div class="border-divisor-big">
-    <h1><span id="icon_work" class="material-icons">work</span>Expériences</h1>
+  <div class="border-divisor-big"></div>
+
+  <div>
+    <h1><span class="material-icons icon-i">work</span>Expériences</h1>
     <h3> Février - mai 2022 <br> Stage chez Cetic asbl (Hybride) - Charleroi, Belgique</h3>
     <h4>Développement d’une application web de monitoring, Angular</h4>
     <div class="border-divisor"></div>
@@ -53,23 +52,24 @@
     <h4>Développement d’une application web service, WinDev</h4>
     <div class="border-divisor"></div>
 
-    <h3>2019 <br> La Cédraie - Mons, Belgique</h3>
+    <h3>Juin - décembre 2019 <br> La Cédraie - Mons, Belgique</h3>
     <h4>Job étudiant en Restauration rapide</h4>
     <div class="border-divisor"></div>
 
-    <h3>Depuis 2016 <br> Apprentus </h3>
-    <a href="https://apprentus.be/in/ahmad.barutchi">https://apprentus.be/in/ahmad.barutchi</a>
-    <h4>Professeur particulier d’informatique et de musique (à domicile et à distance), Belgique</h4>
+    <h3>Depuis août 2016 <br> Apprentus - Belgique</h3>
+    <a href="https://apprentus.be/ahmad.barutchi">https://apprentus.be/ahmad.barutchi</a>
+    <h4>Professeur particulier d’informatique et de musique (à domicile et à distance)</h4>
     <div class="border-divisor"></div>
 
-    <h3>2013 -2015 <br> Secouriste bénévole</h3>
-    <h4>Croissant Rouge - Alep, Syrie</h4>
+    <h3>2013 -2015 <br> Bénévole à la Croissant Rouge - Alep, Syrie</h3>
+    <h4>Distribution de colis alimentaire - Soutien émotionnel aux enfants atteints de cancer - Sécouriste</h4>
   </div>
 
 
-  <div class="border-divisor-big">
-    <br>
-    <h1><span id="icon_studies" class="material-icons">fact_check</span>Formations</h1>
+  <div class="border-divisor-big"></div>
+
+  <div>
+    <h1><span class="material-icons icon-i">fact_check</span>Formations</h1>
 
     <h3> 2017-2022 <br> HEH - Haute École en Hainaut - Mons, Belgique </h3>
     <h4>Bachelier en Informatique et Systèmes, Orientation Réseaux et Télécommunications (option développement)</h4>
@@ -95,7 +95,7 @@
 
   <div class="competence">
     <br>
-    <h1><span id="icon_skills" class="material-icons">rocket_launch</span>Compétences</h1>
+    <h1><span class="material-icons icon-i">rocket_launch</span>Compétences</h1>
     <h4>Dévloppeur Full-Stack (Front-end, Back-end), Développement Mobile (Android), Applications web</h4>
 
     <h3>FRAMEWORKS</h3>
@@ -110,8 +110,6 @@
     <h3>LOGICIELS</h3>
     <h4>Git, Docker, IntelliJ IDEA, Android Studio, MySQL, PostgreSQL</h4>
   </div>
-
-
 </div>
 
 <div class="transition-pic">
@@ -124,20 +122,19 @@
 </div>
 
 <script>
-  var root = document.getElementById('portrait');
+  var root = document.getElementById("portrait");
 
-  var mouse_monitor = function(e) {
-    let x = e.clientX/innerWidth;
-    let y = e.clientY/innerHeight;
+  var mouse_monitor = function (e) {
+    let x = e.clientX / innerWidth;
+    let y = e.clientY / innerHeight;
 
-    let move_x = (x>0.5) ? '-30px' : '30px';
-    let move_y = (y>0.5) ? '-20px' : '20px';
+    let move_x = x > 0.5 ? "-30px" : "30px";
+    let move_y = y > 0.5 ? "-20px" : "20px";
 
     root.style.setProperty("--translate-x", move_x);
     root.style.setProperty("--translate-y", move_y);
-  }
+  };
 
   root.addEventListener("mousemove", mouse_monitor);
-
 
 </script>

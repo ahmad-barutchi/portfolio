@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import {Router} from "@angular/router";
-import {TfeComponent} from "./activities/tfe/tfe.component";
 
 @Component({
   selector: 'app-root',

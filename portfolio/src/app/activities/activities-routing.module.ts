@@ -4,7 +4,7 @@ import {TfeComponent} from "./tfe/tfe.component";
 import {ActivitiesComponent} from "./activities.component";
 
 const routes: Routes = [{
-  path: '',
+  path: 'activities',
   component: ActivitiesComponent,
   children: [{
     path: 'tfe',

@@ -1,1 +1,202 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import url('https://fonts.googleapis.com/css?family=Exo:400,700');
+.border-divisor {
+  margin: 30px auto 30px auto;
+  width: 40%;
+  border-bottom: solid black 1px;
+}
+.border-divisor-mid {
+  margin: 50px auto 50px auto;
+  width: 70%;
+  border-bottom: solid #f8b334 3px;
+}
+.border-divisor-big {
+  margin: 70px;
+  border-bottom: solid deeppink 5px;
+}
+
+
+
+
+
+*{
+  margin: 0px;
+  padding: 0px;
+}
+
+body{
+  font-family: 'Exo', sans-serif;
+}
+
+
+.context {
+  width: 100%;
+  position: absolute;
+  top:50vh;
+
+}
+
+.context h1{
+  text-align: center;
+  color: #fff;
+  font-size: 50px;
+}
+
+
+.area{
+  background: -webkit-linear-gradient(to left, deeppink, pink);
+  width: 100%;
+
+}
+
+.circles{
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.circles li{
+  position: absolute;
+  display: block;
+  list-style: none;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 55, 200, 0.4);
+  animation: animate 65s linear infinite;
+  bottom: -150px;
+
+}
+
+.circles li:nth-child(1){
+  left: 25%;
+  width: 80px;
+  height: 80px;
+  animation-delay: 0s;
+}
+
+
+.circles li:nth-child(2){
+  left: 10%;
+  width: 20px;
+  height: 20px;
+  animation-delay: 2s;
+  animation-duration: 22s;
+}
+
+.circles li:nth-child(3){
+  left: 70%;
+  width: 20px;
+  height: 20px;
+  animation-delay: 4s;
+}
+
+.circles li:nth-child(4){
+  left: 40%;
+  width: 60px;
+  height: 60px;
+  animation-delay: 0s;
+  animation-duration: 48s;
+}
+
+.circles li:nth-child(5){
+  left: 65%;
+  width: 20px;
+  height: 20px;
+  animation-delay: 0s;
+}
+
+.circles li:nth-child(6){
+  left: 75%;
+  width: 110px;
+  height: 110px;
+  animation-delay: 3s;
+}
+
+.circles li:nth-child(7){
+  left: 35%;
+  width: 150px;
+  height: 150px;
+}
+
+.circles li:nth-child(8){
+  left: 50%;
+  width: 25px;
+  height: 25px;
+  animation-duration: 45s;
+}
+
+.circles li:nth-child(9){
+  left: 20%;
+  width: 15px;
+  height: 15px;
+  animation-delay: 2s;
+  animation-duration: 35s;
+}
+
+.circles li:nth-child(10){
+  left: 85%;
+  width: 150px;
+  height: 150px;
+  animation-delay: 0s;
+  animation-duration: 35s;
+}
+
+.circles li:nth-child(11){
+  left: 15%;
+  width: 100px;
+  height: 100px;
+  animation-delay: 9s;
+  animation-duration: 75s;
+}
+
+.circles li:nth-child(12){
+  left: 25%;
+  width: 60px;
+  height: 60px;
+  animation-delay: 0s;
+  animation-duration: 29s;
+}
+
+.circles li:nth-child(13){
+  left: 45%;
+  width: 50px;
+  height: 50px;
+  animation-delay: 0s;
+  animation-duration: 32s;
+}
+
+.circles li:nth-child(14){
+  left: 65%;
+  width: 50px;
+  height: 50px;
+  animation-delay: 0s;
+  animation-duration: 25s;
+}
+
+.circles li:nth-child(15){
+  left: 80%;
+  width: 90px;
+  height: 90px;
+  animation-duration: 55s;
+}
+
+
+@keyframes animate {
+
+  0%{
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+    border-radius: 0;
+  }
+
+  100%{
+    transform: translateY(-9000px) rotate(720deg);
+    opacity: 0;
+    border-radius: 50%;
+  }
+
+}

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { ActivitiesRoutingModule } from './activities-routing.module';
 import { TfeComponent } from './tfe/tfe.component';
+import {MatCardModule} from "@angular/material/card";
+import {MatChipsModule} from "@angular/material/chips";
 
 
 @NgModule({
@@ -11,7 +13,9 @@ import { TfeComponent } from './tfe/tfe.component';
   ],
   imports: [
     CommonModule,
-    ActivitiesRoutingModule
+    ActivitiesRoutingModule,
+    MatCardModule,
+    MatChipsModule,
   ]
 })
 export class ActivitiesModule { }
