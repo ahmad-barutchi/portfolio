@@ -12,10 +12,8 @@ import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { ContactComponent } from './contact/contact.component';
 import {ActivitiesComponent} from "./activities/activities.component";
-import {MatCardModule} from "@angular/material/card";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {TfeComponent} from "./activities/tfe/tfe.component";
-import {MatChipsModule} from "@angular/material/chips";
+import {ActivitiesModule} from "./activities/activities.module";
 
 @NgModule({
   declarations: [
@@ -26,7 +24,6 @@ import {MatChipsModule} from "@angular/material/chips";
     FooterComponent,
     ContactComponent,
     ActivitiesComponent,
-    TfeComponent,
   ],
   imports: [
     BrowserModule,
@@ -34,9 +31,8 @@ import {MatChipsModule} from "@angular/material/chips";
     MatIconModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
-    MatCardModule,
     BrowserAnimationsModule,
-    MatChipsModule,
+    ActivitiesModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,13 +1,6 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 // @import "compass-mixins";
 
-.body-class {
-  color: slateblue;
-  text-align: center;
-  max-width: 72%;
-  margin: auto;
-}
-
 h1 {
   color: black;
 }
@@ -17,6 +10,7 @@ h3 {
 a {
   cursor: pointer;
   text-decoration: none;
+  color: slateblue;
 }
 
 .bio{
@@ -26,7 +20,7 @@ a {
 .my-img {
   border-radius: 50%;
   max-height: 220px;
-  margin: auto auto 20px;
+  margin: 30px auto 20px;
   display: block;
 }
 
@@ -42,34 +36,16 @@ a {
   margin: 10px;
 }
 .LanguageTitle {
-  margin-right: 70px;
-  margin-bottom: 40px;
+  margin: 20px 70px 40px;
 }
 .driving {
+  margin-top: 20px;
   display: inline-block;
   margin-right: 70px;
 }
-.icon {
+.icon-image {
   max-width: 20px;
   margin-right: 5px;
-  color: slateblue;
-}
-.icon-big {
-  border-radius: 50%;
-  width: 40px;
-  margin-right: 5px;
-}
-.icon-language {
-  margin-right: 9px;
-}
-.icon-i {
-  margin-right: 30px;
-  transform: scale(2);
-}
-.icon-dev {
-  transform: scale(2);
-  margin-right: 25px;
-  color: gray;
 }
 .material-icons-driving {
   transform: scale(4);
@@ -79,6 +55,7 @@ a {
   float: left;
 }
 .flt-parent {
+  margin-top: 50px;
   overflow: hidden;
 }
 

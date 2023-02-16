@@ -1,6 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 @import url('https://fonts.googleapis.com/css?family=Exo:400,700');
+
+.body-class {
+  color: slateblue;
+  text-align: center;
+  max-width: 72%;
+  margin: 50px auto;
+}
+a {
+  text-decoration: none;
+  color: black;
+}
+
+// Borders
 .border-divisor {
   margin: 30px auto 30px auto;
   width: 40%;
@@ -15,26 +28,28 @@
   margin: 70px;
   border-bottom: solid deeppink 5px;
 }
-
+// icons style
+.icon {
+  transform: scale(1.3);
+  margin-right: 20px;
+  color: slateblue;
+}
+.icon-big {
+  width: 40px;
+  margin-right: 5px;
+}
 
 
 
 
 *{
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
-
-body{
-  font-family: 'Exo', sans-serif;
-}
-
-
 .context {
   width: 100%;
   position: absolute;
   top:50vh;
-
 }
 
 .context h1{

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {Router} from "@angular/router";
+import {TfeComponent} from "./tfe/tfe.component";
 
 @Component({
   selector: 'app-activities',
@@ -10,6 +11,6 @@ export class ActivitiesComponent {
   constructor(private router: Router) { }
 
   goToTfe() {
-    this.router.navigate(['activities/tfe']);
+    this.router.navigate(['/activities/tfe']);
   }
 }
