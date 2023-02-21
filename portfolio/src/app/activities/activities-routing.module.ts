@@ -3,7 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import {TfeComponent} from "./tfe/tfe.component";
 
 const routes: Routes = [
-    { path: 'tfe', component: TfeComponent },
+    { path: 'activities/tfe', component: TfeComponent },
+
 ];
 
 @NgModule({
