@@ -1,18 +1,22 @@
+import { initializeApp } from "firebase/app";
+
+import { getAnalytics } from "firebase/analytics";
+
 const firebaseConfig = {
 
-  apiKey: "AIzaSyAcUQTgC7K1N2_ILFnGNvBLU1WaO0bqidc",
+  apiKey: "AIzaSyAVQ8Z068ugQ7ciQ-BCSRH72vP5aDstAMY",
 
-  authDomain: "ahmad-barutchi.firebaseapp.com",
+  authDomain: "abarutchi.firebaseapp.com",
 
-  projectId: "ahmad-barutchi",
+  projectId: "abarutchi",
 
-  storageBucket: "ahmad-barutchi.appspot.com",
+  storageBucket: "abarutchi.firebasestorage.app",
 
-  messagingSenderId: "972887888321",
+  messagingSenderId: "123827535454",
 
-  appId: "1:972887888321:web:db6245b9652c5caa471f40",
+  appId: "1:123827535454:web:b68ebaf276568f4d673ecf",
 
-  measurementId: "G-QFTW7VZXPK"
+  measurementId: "G-B1VMYMELGH"
 
 };
 
