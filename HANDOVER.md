@@ -6,6 +6,10 @@
 > la spécification composant par composant, **tout le contenu du site actuel** (corrigé), les budgets de
 > performance, la structure cible du repo, le déploiement Firebase et un plan de travail par phases.
 > L'application Angular existante doit être **supprimée** : tout ce qu'il faut en garder est ici.
+> **Maquette de référence** (hero + bento, sombre / clair / mobile, interactive) : https://claude.ai/artifact/Vvs6kQE2NkrDLKixhWypNH
+> Elle est privée : Ahmad doit la partager (menu Share) pour qu'un autre compte puisse l'ouvrir.
+> Pour le hero et le bento, **la maquette fait foi** en cas d'écart avec ce texte ; son code source
+> (fichier `project/Main.dc.html` de l'artifact) contient l'implémentation de référence du champ de points.
 
 ---
 
@@ -13,6 +17,7 @@
 
 | Sujet | Décision |
 |---|---|
+| Maquette | https://claude.ai/artifact/Vvs6kQE2NkrDLKixhWypNH (privée, à partager par Ahmad) |
 | Nom de code du design | **SIGNAL** — encre bleu-nuit, un seul accent ambre « balise », un champ de points vivant en hero, typographie éditoriale XXL. Thème clair « papier & encre » équivalent. |
 | Stack | **Astro** (sortie 100 % statique) + **TypeScript** + **CSS vanilla moderne** (custom properties, `oklch`, container queries, scroll-driven animations, view transitions). Aucun framework UI, aucune lib d'animation. |
 | JS livré | ≤ 15 KB gzip pour tout le site, ≤ 5 KB sur la page d'accueil. Un seul morceau « riche » : le canvas du hero (~2,5 KB). |
@@ -71,7 +76,7 @@
 | Langage | **TypeScript strict** pour les scripts et la config, **HTML/CSS** dans les composants `.astro` | Pas de runtime, typage du contenu. |
 | Styles | **CSS vanilla** en `@layer`, custom properties, `oklch()` + `color-mix()`, container queries, `:has()`, `animation-timeline: view()`, `@view-transition` | Garde le CSS < 20 KB, design sur mesure (un utilitaire comme Tailwind pousse vers un look générique et ajoute une toolchain). |
 | Interactivité | `<script>` Astro vanilla (bundlés, `type="module"`, différés) | Les seuls besoins JS : champ de points du hero, thème, nav active, halo curseur/magnétisme, copie d'e-mail, heure locale, zoom d'image via `<dialog>`. |
-| Polices | Auto-hébergées via Fontsource : **Geist Variable** (`@fontsource-variable/geist`), **Instrument Serif** italique (`@fontsource/instrument-serif`), mono = pile système (`ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`) | Deux fichiers woff2, sous-ensemble latin uniquement, `font-display: swap` + `size-adjust` sur les fallbacks pour zéro CLS. |
+| Polices | Auto-hébergées via Fontsource : **Geist Variable** (`@fontsource-variable/geist`), **Instrument Serif** italique (`@fontsource/instrument-serif`), **Geist Mono** poids 500 (`@fontsource/geist-mono`), pile de secours `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace` | Trois fichiers woff2, sous-ensemble latin uniquement, `font-display: swap` + `size-adjust` sur les fallbacks pour zéro CLS. |
 | Images | `astro:assets` (`<Image>` / `<Picture>`), sources dans `src/assets/` | AVIF + WebP, dimensions explicites, lazy sauf LCP. |
 | Qualité | `astro check`, Prettier + `prettier-plugin-astro`, Playwright (Chromium préinstallé dans ces sessions : `/opt/pw-browsers/chromium`), Lighthouse | Voir section 8 pour les seuils. |
 | Hébergement | Firebase Hosting (Spark/gratuit), `firebase.json` à la racine | Déjà en place, domaine `abarutchi.web.app` conservé. |
@@ -102,13 +107,13 @@ Références d'ambiance (pas à copier) : la rigueur typographique de linear.app
 
 ### 3.2 Walkthrough — ce que voit le visiteur
 
-**0 s — Arrivée.** Fond d'encre bleu-nuit (pas un noir plat). Aucun spinner : le HTML est déjà là. En ~400 ms, les deux lignes `AHMAD` / `BARUTCHI` se lèvent chacune depuis un masque (clip), avec 80 ms de décalage, en Geist 600, interlettrage serré, taille ~10 vw. Sous le nom, une ligne de télémétrie en mono, petites capitales :
-`● OUVERT AUX OPPORTUNITÉS · MONS, BELGIQUE · 14:32 CET` — le point pulse doucement, l'heure est locale (Europe/Brussels).
-Puis une phrase de position, en Geist 400 à ~1,25 rem, avec un seul mot en **Instrument Serif italique** :
-« Développeur *full-stack*. Python, Odoo, Angular. »
-Deux boutons : « Voir mes projets » (plein ambre, texte encre) et « Télécharger le CV » (fantôme, bordure 1 px).
+**0 s — Arrivée.** Fond d'encre bleu-nuit (pas un noir plat). Aucun spinner : le HTML est déjà là. En ~1 s, les deux lignes `Ahmad` / `Barutchi.` (casse normale, la seconde décalée de 0,62 em) se lèvent chacune depuis un masque, avec 100 ms de décalage, en Geist 600, interlettrage −0,055 em, taille `clamp(64px, 14cqi, 224px)`. Le point final est **ambre** et pulse doucement : c'est la balise. À droite de « Ahmad », un bloc de télémétrie mono façon HUD :
+`STATUT ● Ouvert aux opportunités` / `HEURE 01:27 CEST · Mons` / `COORD. 50.45° N · 3.95° E` — le point pulse, l'heure est locale (Europe/Brussels, rafraîchie toutes les 15 s).
+Sous un filet de 1 px (un « paquet » ambre le parcourt toutes les 5,5 s), une phrase de position avec un seul mot en **Instrument Serif italique** :
+« **Développeur *full-stack* basé à Mons.** Python, Odoo et Angular, du capteur jusqu'au tableau de bord. »
+Deux boutons à droite : « Voir les projets ↘ » (plein ambre, texte encre) et « ↓ CV · PDF » (fantôme). Quatre croix de repère fines marquent les coins de la zone de contenu ; « Défiler » + un trait animé en bas au centre.
 
-**Derrière le nom — le champ de signal.** Une grille de points fins (espacement 28 px, rayon 1 px, contraste très bas) occupe tout le hero. Toutes les ~6 s, une onde circulaire part d'un point aléatoire et traverse le champ : les points qu'elle touche grossissent et s'allument en ambre pendant une fraction de seconde, puis s'éteignent. Quand le visiteur bouge la souris, les points dans un rayon de ~180 px se tendent vers le curseur (≤ 6 px), grossissent jusqu'à 2,5 px et s'allument en ambre selon la proximité, avec un retard élastique (interpolation 0,08 par frame) : le champ a une masse. Sur tactile, pas de curseur : l'onde continue et le champ « respire » (alpha sinusoïdal très lent). Avec `prefers-reduced-motion`, le champ est statique.
+**Derrière le nom — le champ de signal.** Une grille de points fins (espacement 28 px, rayon 1 px, contraste très bas) occupe tout le hero. Toutes les ~6 s, une onde circulaire part d'un point aléatoire et traverse le champ : les points qu'elle touche grossissent et s'allument en ambre pendant une fraction de seconde, puis s'éteignent. Quand le visiteur bouge la souris, les points dans un rayon de ~190 px **s'écartent légèrement** du curseur (≤ 10 px, effet de loupe), grossissent jusqu'à ~2,8 px et s'allument en ambre selon la proximité, avec un retard élastique (interpolation 0,12 par frame) : le champ a une masse. L'onde laisse une traînée qui s'éteint en ~1 s et un anneau ambre très pâle marque son front. Sur tactile, pas de curseur : l'onde continue et le champ « respire » (alpha sinusoïdal très lent). Avec `prefers-reduced-motion`, le champ est statique.
 
 **5 s — Premier scroll.** Une barre de progression ambre de 2 px apparaît en haut. La **nav flottante** (une pilule de verre, 44 px de haut, en haut à droite sur desktop) glisse en place ; son indicateur de section actif est une petite capsule claire qui **glisse** d'un item à l'autre (pas un simple changement de couleur). Chaque section s'ouvre par une étiquette mono `01 — À propos` et un titre XXL dont un mot est en serif italique. Les blocs apparaissent par une **remontée de 24 px + fondu**, pilotée par le scroll en CSS pur (`animation-timeline: view()`), donc sans JS et sans saccade.
 
@@ -116,7 +121,7 @@ Deux boutons : « Voir mes projets » (plein ambre, texte encre) et « Télécha
 
 **02 — Parcours.** Une ligne de temps verticale : un rail à gauche avec les années en mono, une ligne de 1 px qui **se dessine** à mesure que l'on scrolle (scroll-driven), des cartes à droite. L'entrée BHC est mise en avant (bordure ambre, chips de techno). Dessous, les **Formations** en grille compacte de 5 cartes.
 
-**03 — Projets.** Une grille **bento** : la tuile « Robot secouriste » occupe 2×2, avec la capture du dashboard **inclinée en perspective** (`rotateX(8deg)`) qui s'aplatit au survol ; un **halo ambre suit le curseur** le long de la bordure de chaque tuile (gradient radial positionné par deux variables CSS). Tuiles 1×1 : DeepVision, Single Digital Gateway, Portfolio. En dessous, un **journal des hackathons** en mono, 7 lignes, `date · événement · lieu`.
+**03 — Projets.** Une grille **bento** de 4 colonnes : la tuile « Robot secouriste » occupe 2×2, avec la capture du dashboard dans un cadre d'application **inclinée en 3D** (`rotateX(16deg) rotateY(-12deg) rotateZ(2.5deg)`, débordant en bas à droite) qui se redresse au survol ; un **halo ambre suit le curseur** le long de la bordure de **toutes** les tuiles à la fois (gradient radial positionné par deux variables CSS par tuile). Tuiles 1×1 : DeepVision (glyphe d'iris), Single Digital Gateway (anneau de 12 points façon UE). Tuile 2×1 « **Mons.** » : un **radar** dont le balayage allume tour à tour Bruxelles, Charleroi, Namur, Liège et Gand, les lieux où Ahmad a travaillé, étudié ou participé à des hackathons, plus les langues. Tuile 3×1 : **journal des hackathons**, 7 lignes `date · événement · lieu · ↗`. Tuile 1×1 : ce portfolio (monogramme `ab.`).
 Clic sur la tuile du robot → **transition de vue** : la capture s'agrandit et devient l'image d'en-tête de l'étude de cas, sans rechargement perceptible (`view-transition-name`, cross-document, 0 JS).
 
 **04 — Compétences.** Pas de barres, pas de pourcentages. Une **carte de stack** : quatre groupes (Langages, Frameworks, Outils, Concepts) de chips mono. Au survol d'une chip, les chips **liées** s'allument (Odoo → Python, PostgreSQL, JavaScript) et les autres s'estompent : une dizaine de lignes de JS, données dans le JSON.
@@ -141,30 +146,32 @@ Source de vérité en `oklch` ; les hex sont des approximations pour les maquett
 | `--bg-2` | `oklch(18% 0.015 260)` ≈ `#13161F` | `#FFFFFF` | surfaces, cartes |
 | `--bg-3` | `oklch(22% 0.015 260)` ≈ `#1B1F2A` | `oklch(94% 0.008 80)` ≈ `#EDE9E1` | surfaces survolées, chips |
 | `--fg` | `oklch(95% 0.01 80)` ≈ `#F3EFE6` | `oklch(18% 0.015 260)` ≈ `#14161E` | texte principal |
-| `--fg-2` | `oklch(72% 0.01 260)` ≈ `#A3A7B5` | `oklch(45% 0.01 260)` ≈ `#5B5F6E` | texte secondaire |
-| `--fg-3` | `oklch(50% 0.01 260)` ≈ `#656A79` | `oklch(62% 0.01 260)` ≈ `#8B8F9C` | étiquettes, points du champ |
+| `--fg-2` | `oklch(76% 0.012 260)` ≈ `#AEB2C0` | `oklch(44% 0.012 260)` ≈ `#585C6A` | texte secondaire |
+| `--fg-3` | `oklch(64% 0.012 260)` ≈ `#8B90A0` | `oklch(50% 0.012 260)` ≈ `#666B78` | étiquettes mono (≥ 4,5:1 sur `--bg`) |
 | `--accent` | `oklch(82% 0.16 75)` ≈ `#FFB454` | `oklch(70% 0.17 60)` ≈ `#E0781A` | balise : boutons, halo, onde |
-| `--accent-text` | = `--accent` | `oklch(52% 0.16 55)` ≈ `#B35A05` | accent **en texte petit** sur fond clair (≥ 4,5:1) |
+| `--accent-text` | = `--accent` | `#A14E00` (≈ 5:1) | accent **en texte petit** sur fond clair (≥ 4,5:1) |
 | `--accent-soft` | `color-mix(in oklch, var(--accent) 14%, transparent)` | idem | fonds de chips actives |
 | `--line` | `color-mix(in oklch, var(--fg) 10%, transparent)` | `… 12%` | bordures 1 px |
 | `--glow` | `color-mix(in oklch, var(--accent) 35%, transparent)` | `… 25%` | halo curseur |
 
-Contrastes vérifiés : `--fg`/`--bg` ≈ 17:1 (sombre) et 15:1 (clair) ; `--fg-2` ≥ 5:1 ; `--accent` sur `--bg` sombre ≈ 11:1. Sur fond clair, `#E0781A` ne vaut que ~3,2:1 : **réservé aux grands textes et aux surfaces**, le texte petit utilise `--accent-text`.
+Contrastes vérifiés : `--fg`/`--bg` ≈ 17:1 (sombre) et 15:1 (clair) ; `--fg-2` ≥ 5:1 ; `--fg-3` ≥ 4,5:1 (il ne sert plus aux points du champ) ; `--accent` sur `--bg` sombre ≈ 11:1. Sur fond clair, `#E0781A` ne vaut que ~3,2:1 : **réservé aux grands textes et aux surfaces**, le texte petit utilise `--accent-text`.
 
-Signal field : points = `--fg-3` à alpha 0,35 ; allumés = `--accent` à alpha proportionnelle.
+Signal field : les points ont leur propre gris, pas `--fg-3` : sombre `rgb(150 157 178)` à alpha 0,32, clair `rgb(92 97 114)` à alpha 0,30 ; allumés = `--accent` à alpha proportionnelle.
+
+Variantes d'accent testables dans la maquette (réglage « accent ») : **corail** `#FF8A6B` / clair `#E5532F`, texte `#B33A1B` ; **menthe** `#5EE6B0` / clair `#12A374`, texte `#0B7553`. L'ambre reste le choix par défaut.
 
 ### 4.2 Typographie
 
 | Rôle | Police | Taille (fluide) | Graisse / détails |
 |---|---|---|---|
-| Display (nom, titres de section) | Geist | `clamp(3.5rem, 2rem + 8vw, 8.5rem)` | 600, `letter-spacing: -0.04em`, `line-height: 0.95` |
-| H2 | Geist | `clamp(2rem, 1.2rem + 3.5vw, 3.75rem)` | 600, `-0.03em`, `1.02` |
+| Display (nom du hero) | Geist | `clamp(64px, 14cqi, 224px)`, `21cqi` sous 620 px | 600, `letter-spacing: -0.055em`, `line-height: 0.86` |
+| H2 (titres de section) | Geist | `clamp(40px, 5.6cqi, 84px)` | 600, `-0.05em`, `0.98`, `text-wrap: balance` |
 | H3 | Geist | `clamp(1.25rem, 1rem + 1vw, 1.75rem)` | 500, `-0.01em`, `1.2` |
 | Accent éditorial (1 mot par titre) | Instrument Serif italique | hérite | 400, `font-style: italic`, légèrement plus grand (`1.06em`) |
 | Corps | Geist | `clamp(1rem, 0.95rem + 0.3vw, 1.125rem)` | 400, `line-height: 1.6`, mesure `max-width: 68ch` |
-| Étiquettes / télémétrie | mono système | `0.75rem`–`0.8125rem` | 500, majuscules, `letter-spacing: 0.08em`, `font-variant-numeric: tabular-nums` |
+| Étiquettes / télémétrie | Geist Mono | `0.75rem`–`0.8125rem` | 500, majuscules, `letter-spacing: 0.08em`, `font-variant-numeric: tabular-nums` |
 
-Fallbacks avec métriques ajustées (`size-adjust`, `ascent-override`) : Geist → `Arial`/`Helvetica` ; Instrument Serif → `Georgia`. Précharger les deux woff2 en `<link rel="preload" as="font" crossorigin>`.
+Fallbacks avec métriques ajustées (`size-adjust`, `ascent-override`) : Geist → `Arial`/`Helvetica` ; Instrument Serif → `Georgia` ; Geist Mono → `ui-monospace`. Précharger Geist et Geist Mono (Instrument Serif peut rester sans preload) en `<link rel="preload" as="font" crossorigin>`.
 
 ### 4.3 Espacement, grille, formes
 
@@ -189,7 +196,7 @@ Fallbacks avec métriques ajustées (`size-adjust`, `ascent-override`) : Geist �
 
 - Icônes : SVG inline, trait 1,5 px, 20 px, `currentColor` (flèche ↗, copier, soleil/lune, GitHub, LinkedIn, mail, téléphone, ♪). Jeu Lucide ou dessinées à la main, inlinées à la demande (chacune ≈ 300 octets). Pas d'icon font.
 - Favicon SVG : carré arrondi (rayon 8/32) couleur `--bg`, point ambre r = 5 au centre, arc de 270° r = 10 trait 1,5 ambre à 60 % (une balise). Variante claire via `@media (prefers-color-scheme)` dans le SVG. Ajouter `apple-touch-icon.png` 180 px.
-- OG image 1200×630 : fond encre, champ de points statique, `AHMAD BARUTCHI` en Geist 600 ~120 px, sous-titre « Développeur full-stack · Mons », point ambre. À générer **une fois** avec Playwright (capture d'une page `/og` non liée, ou d'un fichier HTML dans `scripts/`), committer `public/og.png`.
+- OG image 1200×630 : fond encre, champ de points statique, `Ahmad Barutchi.` en Geist 600 ~120 px avec le point en ambre, sous-titre « Développeur full-stack · Mons », point ambre. À générer **une fois** avec Playwright (capture d'une page `/og` non liée, ou d'un fichier HTML dans `scripts/`), committer `public/og.png`.
 
 ---
 
@@ -220,17 +227,18 @@ Phase 2 : `/en/…` miroir anglais via l'i18n d'Astro, `/cv` page CV imprimable 
 │                                                                      │
 │ · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  │
 │ · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  │
-│ · · · AHMAD· · · · · · · · · · · · · · · · · · · · · · · · · · · ·  │
-│ · · · BARUTCHI· · · · · · · · · · · · · · · · · · · · · · · · · · ·  │
-│ · · · ● OUVERT AUX OPPORTUNITÉS · MONS, BE · 14:32 CET · · · · · ·  │
-│ · · · Développeur full-stack. Python, Odoo, Angular.· · · · · · · ·  │
-│ · · · [ Voir mes projets ]  [ Télécharger le CV ↓ ]· · · · · · · ·  │
+│ + · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · +  │
+│ · · Ahmad · · · · · · · · · · · · · · ·  STATUT ● Ouvert aux opport. │
+│ · · · · · · · · · · · · · · · · · · · ·  HEURE  01:27 CEST · Mons    │
+│ · · · · · Barutchi● · · · · · · · · · ·  COORD. 50.45° N · 3.95° E  │
+│ ──────────────────────────────────────────────────────────────────  │
+│ Développeur full-stack basé à Mons.      [ Voir les projets ↘ ] [CV]│
 │ · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  │
 │                                                   ↓ défiler · · · ·  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-Le nom est aligné sur la colonne 2 de la grille, pas centré. Hauteur `100svh`. Le champ de points est un `<canvas>` absolu en arrière-plan, `aria-hidden`.
+Le nom est aligné à gauche, la 2e ligne décalée ; la télémétrie s'aligne sur la 1re ligne. Hauteur `100svh` (880 px dans la maquette). Le champ de points est un `<canvas>` absolu en arrière-plan, `aria-hidden`.
 
 ### 5.3 Hero — mobile (< 640 px)
 
@@ -238,16 +246,16 @@ Le nom est aligné sur la colonne 2 de la grille, pas centré. Hauteur `100svh`.
 ┌──────────────────────┐
 │ ab·              ☰   │
 │ · · · · · · · · · ·  │
-│ AHMAD                │
-│ BARUT-               │   (le nom peut casser : autoriser
-│ CHI                  │    `overflow-wrap: anywhere` sur
-│ ● OUVERT · MONS      │    la 2e ligne ou réduire à 13vw)
+│ STATUT ● Ouvert …    │   (télémétrie au-dessus du nom)
+│ Ahmad                │
+│  Barutchi●           │   (nom à 21cqi ≈ 82 px : tient
+│ ──────────────────── │    sur deux lignes sans césure)
 │ Développeur          │
 │ full-stack.          │
 │ Python, Odoo,        │
 │ Angular.             │
-│ [ Voir mes projets ] │
-│ [ Télécharger le CV ]│
+│ [Voir projets][ CV ] │
+│                      │
 └──────────────────────┘
 ```
 
@@ -285,19 +293,20 @@ Formations
 03 — Projets
 Des choses que j'ai construites.
 
-┌──────────────────────────────┐ ┌─────────────┐
-│  ROBOT SECOURISTE · TFE 2022 │ │ DeepVision  │
-│  [capture dashboard inclinée]│ │ Hackathon   │
-│  Flask · Angular · Arduino   │ │ 2023 · ↗    │
-│  Lire l'étude de cas →       │ ├─────────────┤
-│                              │ │ SDG 2019 ↗  │
-└──────────────────────────────┘ └─────────────┘
-┌─────────────┐ ┌──────────────────────────────┐
-│ Portfolio v2│ │ Journal des hackathons        │
-│ Astro · 2026│ │ 2023·02  CSLabs Le Handicap  UNamur │
-│ Source ↗    │ │ 2020·03  Citizens of Wallonia ULiège│
-└─────────────┘ │ … (7 lignes, mono)            │
-                └──────────────────────────────┘
+┌───────────────────────────────┐ ┌──────────────┐ ┌──────────────┐
+│ TFE 2022 · BINÔME · IOT [ÉTUDE]│ │ (iris)    ↗  │ │ (anneau)  ↗  │
+│ Robot secouriste              │ │ HACKATHON    │ │ HACKATHON    │
+│ texte · chips · liens         │ │ DeepVision   │ │ Single Digit.│
+│                               │ └──────────────┘ └──────────────┘
+│   ╱ capture inclinée 3D ╱     │ ┌───────────────────────────────┐
+│  ╱ (déborde du cadre)  ╱      │ │ BASE · BELGIQUE     ( radar ) │
+└───────────────────────────────┘ │ Mons.  FR·C2 EN·C1 AR·C2       │
+                                  └───────────────────────────────┘
+┌───────────────────────────────────────────────────┐ ┌──────────────┐
+│ JOURNAL DES HACKATHONS              7 PARTICIPATIONS │ │ ab.       ↗  │
+│ FÉV 2023  CSLabs · Le Handicap        UNAMUR    ↗ │ │ CE SITE · V2 │
+│ … 7 lignes                                        │ │ Portfolio    │
+└───────────────────────────────────────────────────┘ └──────────────┘
 ```
 
 ### 5.6 Étude de cas `/projets/robot-secouriste`
@@ -349,10 +358,10 @@ Spécification du champ de points (≤ 2,5 KB minifié, ≤ 100 lignes) :
 - `<canvas>` absolu, dimensionné au hero, `devicePixelRatio` respecté (max 2), redimensionnement par `ResizeObserver` (débounce 150 ms).
 - Grille : pas 28 px (24 px sous 640 px), chaque point = `{x, y, ox, oy, r, a}` (position courante, origine, rayon, allumage 0..1). Plafond ≈ 3 000 points (1920×1080 / 28² ≈ 2 600).
 - Boucle `requestAnimationFrame` active **seulement** si le hero est dans le viewport (IntersectionObserver) **et** l'onglet visible (`visibilitychange`).
-- Pointeur (`pointermove` sur `window`, uniquement si `matchMedia('(hover: hover)')`) : pour chaque point à distance `d < 180` : cible `ox + (dx/d) · 6 · (1 − d/180)` (recul doux), `r` cible `1 + 1.5 · (1 − d/180)`, `a` cible `1 − d/180`. Interpolation `v += (cible − v) · 0.08` chaque frame ; hors rayon, cible = origine, `a → 0`.
-- Onde : toutes les 5–7 s (aléatoire), choisir un point origine, rayon `R(t) = 420 · t` px sur 1,4 s ; les points avec `|dist − R| < 22` prennent `a = max(a, 1 − |dist − R| / 22)`, et `a` décroît de 0,05/frame.
-- Rendu : un `fillStyle` pour les points éteints (`--fg-3` alpha 0,35, lu via `getComputedStyle` au changement de thème), puis les points allumés en `--accent` avec alpha `a` ; `fillRect` pour les points de 1 px, `arc` au-delà. Pas de `shadowBlur`.
-- Tactile : pas de pointeur, onde + respiration `a = 0.08 · (1 + sin(t/3000 + x/400))`.
+- Pointeur (`pointermove` sur le hero, ignoré si `pointerType === 'touch'`) : avec `dx = ox − px`, `d` la distance et `k = 1 − d/190` pour `d < 190` : cible `ox + (dx/d) · 10 · k²` (**effet de loupe : les points s'écartent**), `r` cible `1 + 1.8 · k`, `a` cible `k^1.4`. Interpolation `v += (cible − v) · 0.12` (0,14 pour `r`) chaque frame ; hors rayon, cible = origine, `a → 0`. Convertir les coordonnées avec le ratio `getBoundingClientRect().width / offsetWidth` si un parent est mis à l'échelle.
+- Onde : toutes les 5,2–7,6 s, origine aléatoire dans les 70 % centraux ; rayon `R(t) = 0.55 · t` px (t en ms) jusqu'à `0,95 × diagonale`, amplitude `1 − R / (0,95 × diagonale)` ; les points avec `|dist − R| < 30` prennent `w = max(w, (1 − |dist − R|/30) · amplitude)` dans un tableau séparé, qui décroît de ×0,955 par frame (traînée) ; un anneau `--accent` à alpha `0.14 × amplitude` dessine le front.
+- Rendu : passe 1, points éteints en gris dédié (voir 4.1) avec alpha `base × respiration × (1 − allumage)`, `fillRect` de `1.5 · r` px ; passe 2, points allumés (`allumage = max(a, w) ≥ 0.03`) en `--accent` avec `arc` de rayon `0.95 · r`. Les couleurs sont recalculées au changement de thème ou d'accent, jamais par frame. Pas de `shadowBlur`.
+- Respiration permanente (souris ou tactile) : `0.72 + 0.28 · sin(t/1700 + x/230 + y/310)` sur l'alpha des points éteints. Masque CSS sur le canvas : `linear-gradient(to bottom, #000 55%, transparent 98%)` pour fondre le bas du hero.
 - `prefers-reduced-motion: reduce` → un seul rendu statique, aucune boucle.
 - Nettoyage : l'onde et le pointeur n'allouent rien par frame (tableaux typés `Float32Array` pour x, y, r, a).
 
@@ -379,9 +388,10 @@ Props `index` (`01`), `id`, `label`, `title` (avec un `<em>` pour le mot en seri
 
 ### 6.7 `ProjectGrid.astro` + `ProjectCard.astro` + `HackathonLog.astro`
 
-- Bento `grid-template-columns: repeat(4, 1fr)`, `grid-auto-rows: 180px`, la tuile vedette `grid-area: span 2 / span 2`. Tablette : 2 colonnes, mobile : 1.
+- Bento `grid-template-columns: repeat(4, minmax(0, 1fr))`, `grid-auto-rows: minmax(248px, auto)`, `gap: 16px`. Ordre DOM : vedette (2×2), DeepVision, SDG, radar (2×1), journal (3×1), portfolio (1×1). Sous 980 px de conteneur : 2 colonnes, journal et portfolio en pleine largeur. Sous 620 px : 2 colonnes, vedette en hauteur auto, radar sous son texte. Utiliser des **container queries** sur un conteneur `container-type: inline-size` et les unités `cqi` pour la typo.
 - Carte : `position: relative; overflow: hidden; border: 1px solid var(--line)`. Halo : `::before` `radial-gradient(240px circle at var(--mx) var(--my), var(--glow), transparent 60%)` sur la **bordure** (pseudo-élément masqué par `mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000); mask-composite: exclude; padding: 1px`) → le halo n'éclaire que le contour. `--mx/--my` posés par un listener `pointermove` délégué sur la grille (8 lignes).
-- Tuile vedette : capture dans un cadre `--bg-3` arrondi, `transform: perspective(1200px) rotateX(8deg) translateY(12px)` → `none` au survol (400 ms). `view-transition-name: projet-robot` sur l'image et `projet-robot-titre` sur le titre ; mêmes noms dans l'en-tête de l'étude de cas.
+- Tuile vedette : capture dans un cadre d'application `--bg-3` (barre à 3 pastilles, rail latéral), largeur 118 %, débordant en bas à droite, `transform: perspective(1500px) rotateX(16deg) rotateY(-12deg) rotateZ(2.5deg)` avec `transform-origin: 0 0` → `perspective(1500px) rotateX(4deg) rotateY(-3deg) translateY(-14px)` au survol (900 ms, `--ease-out`).
+- Tuile radar : cercle de 200 px, anneaux `repeating-radial-gradient`, balayage `conic-gradient` qui tourne en 4 s ; chaque ville est un point dont l'animation (4 s, même période) a un `animation-delay` égal à `angle / 360 × 4 s`, si bien qu'elle s'allume quand le balayage passe. Échelle ≈ 0,75 px/km depuis Mons : BXL (+21, −33), CRL (+26, +3), NAM (+49, −2), LGE (+86, −15), GND (−12, −50). `view-transition-name: projet-robot` sur l'image et `projet-robot-titre` sur le titre ; mêmes noms dans l'en-tête de l'étude de cas.
 - Tuiles externes : titre, étiquette mono (`HACKATHON · 2023`), flèche ↗ qui se déplace en diagonale de 2 px au survol, `rel="noopener"`.
 - Journal : `<table>` ou `<ol>` mono, 7 lignes, lien GitHub quand il existe.
 
@@ -570,7 +580,7 @@ Liens pour la carte de stack (`links`) : Odoo → Python, JavaScript, PostgreSQL
 |---|---|---|
 | JS total (gzip) | 142 KB + 34 KB polyfills | **≤ 15 KB** site entier, **≤ 5 KB** sur `/` hors canvas (canvas ≤ 2,5 KB) |
 | CSS (gzip) | 13 KB (114 KB brut, Material) | **≤ 20 KB** |
-| Polices | 5 fichiers tiers (Google Fonts) | **2 fichiers woff2 auto-hébergés, ≤ 80 KB** au total |
+| Polices | 5 fichiers tiers (Google Fonts) | **3 fichiers woff2 auto-hébergés, ≤ 100 KB** au total |
 | Image LCP | hero = texte (bien) ; portrait 433 KB | portrait **≤ 45 KB** en AVIF 720 px, `srcset` 480/720/960 |
 | Poids total `/` (sans cache) | > 1 MB | **≤ 250 KB** |
 | Requêtes tierces | Google Fonts, imgur, Google Forms, Wikipedia, GitHub assets, smartbear, mongodb | **0** |
