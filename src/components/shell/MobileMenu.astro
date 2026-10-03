@@ -6,33 +6,48 @@
  * cascade, puis « CV · PDF » et « M’écrire ». Comportement : src/scripts/nav.ts.
  */
 import Icon from '../Icon.astro';
-import { NAV, PROFILE, type NavId } from '../../data/site';
+import type { NavId } from '../../data/site';
+import { useI18n } from '../../i18n';
 
 interface Props {
   id: string;
   home?: boolean;
   current?: NavId;
+  /** Même page dans l'autre langue. */
+  switchHref: string;
 }
 
-const { id, home = false, current } = Astro.props;
-const href = (target: NavId) => (home ? `#${target}` : `/#${target}`);
+const { c, t, section, home: homePath } = useI18n(Astro);
+const { NAV, PROFILE } = c;
+const { id, home = false, current, switchHref } = Astro.props;
+const href = (target: NavId) => section(target, home);
 ---
 
-<dialog {id} class="overlay" aria-label="Menu">
+<dialog {id} class="overlay" aria-label={t.menu}>
   <div class="ov-top">
     <a
       class="ov-brand"
-      href={home ? '#accueil' : '/'}
-      aria-label={home ? 'Ahmad Barutchi, haut de page' : 'Ahmad Barutchi, accueil'}
+      href={home ? '#accueil' : homePath}
+      aria-label={home ? t.brandTop : t.brandHome}
     >
       ab<span class="ov-brand-dot" aria-hidden="true"></span>
     </a>
-    <button class="ov-close" type="button" data-menu-close aria-label="Fermer le menu" autofocus>
+    <a
+      class="ov-lang mono"
+      href={switchHref}
+      hreflang={t.switchLang}
+      lang={t.switchLang}
+      aria-label={t.switchAria}
+      data-lang-switch
+    >
+      {t.switchLabel}
+    </a>
+    <button class="ov-close" type="button" data-menu-close aria-label={t.menuClose} autofocus>
       <Icon name="close" size={20} />
     </button>
   </div>
 
-  <nav class="ov-nav" aria-label="Navigation principale">
+  <nav class="ov-nav" aria-label={t.mainNav}>
     <ol class="ov-links" role="list">
       {NAV.map((item, i) => (
         <li style={`--i: ${i}`}>
@@ -56,12 +71,12 @@ const href = (target: NavId) => (home ? `#${target}` : `/#${target}`);
     <a class="btn btn-primary" href={PROFILE.cv} target="_blank" rel="noopener">
       <Icon name="download" />
       <span>
-        <span class="visually-hidden">Télécharger le </span>CV · PDF
+        <span class="visually-hidden">{t.cvDownloadPrefix}</span>CV · PDF
       </span>
     </a>
     <a class="btn btn-ghost" href={`mailto:${PROFILE.email}`}>
       <Icon name="mail" />
-      M’écrire
+      {t.writeMe}
     </a>
   </div>
 </dialog>
@@ -134,6 +149,24 @@ const href = (target: NavId) => (home ? `#${target}` : `/#${target}`);
     border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 12px var(--accent);
+  }
+
+  /* Lien vers l'autre langue, poussé à droite contre le bouton fermer. */
+  .ov-lang {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    border-radius: 999px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--fg-2);
+    text-decoration: none;
+  }
+
+  .ov-lang:hover {
+    color: var(--fg);
   }
 
   .ov-close {
