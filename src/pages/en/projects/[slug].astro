@@ -1,0 +1,11 @@
+---
+/** Case study in English: /en/projects/rescue-robot. */
+import CasePage from '../../../components/case/CasePage.astro';
+import { FEATURED_PROJECT } from '../../../data/site.en';
+
+export function getStaticPaths() {
+  return [{ params: { slug: FEATURED_PROJECT.slug } }];
+}
+---
+
+<CasePage />
