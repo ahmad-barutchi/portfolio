@@ -1,13 +1,503 @@
 ---
-// STUB — remplacé par l'agent « case-study ».
+/**
+ * Étude de cas /projets/robot-secouriste (HANDOVER 5.6, 6.10, 7.6).
+ * En-tête (fil, méta, titre, chapô, faits, capture), corps en mesure ~68ch
+ * avec chapitres h2 / sous-sections h3 ancrés, sommaire collant à droite
+ * (≥ 1100 px), figures zoomables (rendues seulement si le fichier existe),
+ * et « Projet suivant ».
+ * La capture d'en-tête et le titre partagent leurs noms de transition de vue
+ * avec la tuile vedette de l'accueil (projet-robot, projet-robot-titre).
+ */
+import type { GetStaticPaths, ImageMetadata } from 'astro';
 import Base from '../../layouts/Base.astro';
-export function getStaticPaths() {
-  return [{ params: { slug: 'robot-secouriste' } }];
+import Icon from '../../components/Icon.astro';
+import DashboardFrame from '../../components/DashboardFrame.astro';
+import CaseFigure from '../../components/case/CaseFigure.astro';
+import CaseStack from '../../components/case/CaseStack.astro';
+import CaseToc, { type TocItem } from '../../components/case/CaseToc.astro';
+import CaseNext from '../../components/case/CaseNext.astro';
+import ImageViewer from '../../components/case/ImageViewer.astro';
+import { FEATURED_PROJECT, PROJECT_TILES } from '../../data/site';
+import {
+  CASE_ROBOT,
+  CASE_FACTS,
+  CASE_SECTIONS,
+  splitCode,
+  type CaseFigure as CaseFigureData,
+  type CaseSection,
+} from '../../data/case-robot';
+import { caseImage, COVER_NAME } from '../../lib/case-images';
+
+export const getStaticPaths = (() => [
+  { params: { slug: CASE_ROBOT.slug } },
+]) satisfies GetStaticPaths;
+
+const PROJECTS_HREF = '/#projets';
+const cover = caseImage(COVER_NAME);
+const next = PROJECT_TILES[0];
+
+/* Figures : on ne garde que les images présentes dans le dépôt, numérotées dans l'ordre. */
+type Figure = Omit<CaseFigureData, 'images'> & {
+  images: Array<{ src: ImageMetadata; alt: string }>;
+  num: number;
+};
+type FlowItem = { kind: 'p'; text: string } | { kind: 'fig'; fig: Figure };
+type Block = CaseSection & { flow: FlowItem[]; num: string; children: Block[] };
+
+let figureCount = 0;
+
+function buildFlow(section: CaseSection): FlowItem[] {
+  const figures: Figure[] = [];
+  for (const fig of section.figures ?? []) {
+    const images = fig.images.flatMap((img) => {
+      const src = caseImage(img.name);
+      return src ? [{ src, alt: img.alt }] : [];
+    });
+    if (images.length) figures.push({ ...fig, images, num: ++figureCount });
+  }
+  const last = section.paragraphs.length - 1;
+  const placed = (fig: Figure) => Math.min(fig.after ?? last, last);
+  const flow: FlowItem[] = [];
+  section.paragraphs.forEach((text, i) => {
+    flow.push({ kind: 'p', text });
+    for (const fig of figures) if (placed(fig) === i) flow.push({ kind: 'fig', fig });
+  });
+  if (last < 0) for (const fig of figures) flow.push({ kind: 'fig', fig });
+  return flow;
 }
+
+const chapters: Block[] = [];
+for (const section of CASE_SECTIONS) {
+  const block: Block = { ...section, flow: buildFlow(section), num: '', children: [] };
+  const parent = chapters.at(-1);
+  if (section.level === 3 && parent) {
+    parent.children.push(block);
+  } else {
+    block.num = String(chapters.length + 1).padStart(2, '0');
+    chapters.push(block);
+  }
+}
+
+const tocItems: TocItem[] = chapters.map((ch) => ({
+  id: ch.id,
+  label: ch.toc ?? ch.title,
+  num: ch.num,
+  children: ch.children.map((sub) => ({ id: sub.id, label: sub.toc ?? sub.title })),
+}));
 ---
 
-<Base title="Robot secouriste — Ahmad Barutchi" current="projets">
-  <article>
-    <h1>Prototypage d’un robot secouriste</h1>
+<Base
+  title={CASE_ROBOT.pageTitle}
+  description={CASE_ROBOT.description}
+  path={CASE_ROBOT.href}
+  current="projets"
+>
+  <article class="case">
+    <header class="case-head">
+      <div class="case-wrap">
+        <a class="link-quiet crumb" href={PROJECTS_HREF}>
+          <Icon name="arrow-left" size={16} />
+          Projets
+        </a>
+
+        <p class="label case-label">
+          <span class="label-num">{CASE_ROBOT.kind}</span>
+          <span class="label-line" aria-hidden="true"></span>
+          {CASE_ROBOT.team} · {CASE_ROBOT.readingTime}
+        </p>
+
+        <div class="case-top">
+          <h1 class="case-title" style="view-transition-name: projet-robot-titre">
+            {CASE_ROBOT.titleStart} <em class="serif">{CASE_ROBOT.titleEm}</em>
+            <span class="dot-accent">.</span>
+          </h1>
+          <p class="case-lede">{FEATURED_PROJECT.summary}</p>
+        </div>
+
+        <dl class="facts">
+          {CASE_FACTS.map((fact) => (
+            <div>
+              <dt>{fact.label}</dt>
+              <dd>
+                {fact.href ? (
+                  <a class="fact-link" href={fact.href} target="_blank" rel="noopener">
+                    <Icon name="github" size={17} />
+                    {fact.value}
+                    <span class="visually-hidden"> sur GitHub (nouvel onglet)</span>
+                    <Icon name="arrow-up-right" size={15} />
+                  </a>
+                ) : (
+                  fact.value
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div class="case-wrap case-cover">
+        <DashboardFrame
+          image={cover}
+          transitionName="projet-robot"
+          loading="eager"
+          widths={[640, 960, 1280, 1920]}
+          sizes="(min-width: 1440px) 1280px, 92vw"
+        />
+      </div>
+    </header>
+
+    <div class="case-wrap case-body">
+      <div class="prose">
+        {chapters.map((chapter) => (
+          <section class="chap" data-toc-target={chapter.id}>
+            <div class="mono chap-num" aria-hidden="true">
+              <span>{chapter.num}</span>
+              <span class="chap-line" />
+            </div>
+            <h2 id={chapter.id} class="chap-title">
+              {chapter.title}
+            </h2>
+
+            {chapter.flow.map((item) =>
+              item.kind === 'p' ? (
+                <p class="para">
+                  {splitCode(item.text).map((seg) =>
+                    seg.code ? <code>{seg.text}</code> : seg.text,
+                  )}
+                </p>
+              ) : (
+                <CaseFigure
+                  images={item.fig.images}
+                  caption={item.fig.caption}
+                  num={item.fig.num}
+                  layout={item.fig.layout}
+                />
+              ),
+            )}
+
+            {chapter.kind === 'stack' && <CaseStack items={CASE_ROBOT.stack} />}
+
+            {chapter.children.map((sub) => (
+              <section class="subsec" data-toc-target={sub.id}>
+                <h3 id={sub.id} class="sub-title">
+                  {sub.title}
+                </h3>
+                {sub.flow.map((item) =>
+                  item.kind === 'p' ? (
+                    <p class="para">
+                      {splitCode(item.text).map((seg) =>
+                        seg.code ? <code>{seg.text}</code> : seg.text,
+                      )}
+                    </p>
+                  ) : (
+                    <CaseFigure
+                      images={item.fig.images}
+                      caption={item.fig.caption}
+                      num={item.fig.num}
+                      layout={item.fig.layout}
+                    />
+                  ),
+                )}
+              </section>
+            ))}
+          </section>
+        ))}
+      </div>
+
+      <div class="toc-col">
+        <CaseToc items={tocItems} />
+      </div>
+    </div>
+
+    <footer class="case-wrap case-foot">
+      <CaseNext project={next} backHref={PROJECTS_HREF} />
+    </footer>
   </article>
+
+  <ImageViewer />
 </Base>
+
+<style>
+  .case {
+    --measure: 68ch;
+    padding-bottom: clamp(72px, 9vw, 140px);
+  }
+
+  .case-wrap {
+    width: 100%;
+    max-width: calc(var(--container) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* ---------------------------------------------------------------- En-tête */
+
+  .case-head {
+    padding-top: calc(var(--nav-offset) + clamp(4px, 2vw, 28px));
+  }
+
+  .crumb {
+    min-height: 44px;
+    margin-left: -2px;
+    font-size: 14px;
+  }
+
+  .crumb:hover :global(.ic) {
+    transform: translateX(-3px);
+  }
+
+  .case-label {
+    margin: clamp(20px, 3vw, 36px) 0 22px;
+  }
+
+  .case-top {
+    display: grid;
+    gap: clamp(24px, 3vw, 32px);
+  }
+
+  .case-title {
+    max-width: 15ch;
+    font-weight: 600;
+    font-size: clamp(44px, 6.6vw, 104px);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+  }
+
+  .case-lede {
+    max-width: 36ch;
+    font-size: clamp(19px, 1.6vw, 23px);
+    line-height: 1.48;
+    letter-spacing: -0.015em;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 1100px) {
+    .case-top {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 27rem);
+      align-items: end;
+      column-gap: clamp(40px, 5vw, 96px);
+    }
+
+    /* Le chapô s'aligne sur la ligne de base du titre. */
+    .case-lede {
+      padding-bottom: 0.35em;
+    }
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 28px;
+    margin-top: clamp(36px, 4.4vw, 64px);
+  }
+
+  .facts div {
+    padding: 16px 0 0;
+    border-top: 1px solid var(--line-2);
+  }
+
+  .facts dt {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+
+  .facts dd {
+    margin: 8px 0 0;
+    font-size: 15.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+
+  .fact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    margin-block: -6px;
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-2);
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .fact-link :global(.ic) {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .fact-link:hover {
+    border-color: var(--accent);
+  }
+
+  .fact-link:hover :global(.ic:last-child) {
+    transform: translate(2px, -2px);
+  }
+
+  .case-cover {
+    margin-top: clamp(40px, 5vw, 72px);
+  }
+
+  /* Capture réelle : hauteur plafonnée (recadrée par le haut) ; la figure complète
+     est consultable, zoomable, dans « Visualisation ». */
+  .case-cover :global(.dash-img) {
+    max-height: 800px;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  /* ------------------------------------------------------------------ Corps */
+
+  .case-body {
+    margin-top: clamp(64px, 8vw, 128px);
+  }
+
+  .prose {
+    min-width: 0;
+  }
+
+  .chap {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .chap + .chap {
+    margin-top: clamp(56px, 6vw, 88px);
+  }
+
+  .chap-num {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 -6px;
+    color: var(--accent-text);
+  }
+
+  .chap-line {
+    width: 36px;
+    height: 1px;
+    background: var(--line-2);
+  }
+
+  .chap-title {
+    max-width: var(--measure);
+    font-weight: 600;
+    font-size: clamp(30px, 3.4vw, 46px);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  .subsec {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 26px;
+    padding-top: 30px;
+    border-top: 1px solid var(--line);
+  }
+
+  .sub-title {
+    max-width: var(--measure);
+    font-weight: 600;
+    font-size: clamp(21px, 1.2vw + 14px, 26px);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .para {
+    max-width: var(--measure);
+    font-size: clamp(16px, 0.95rem + 0.3vw, 18px);
+    line-height: 1.7;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  /* Premier paragraphe du premier chapitre : un peu plus présent. */
+  .chap:first-child .para:first-of-type {
+    color: var(--fg);
+  }
+
+  .para code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    white-space: nowrap;
+  }
+
+  .toc-col {
+    display: none;
+  }
+
+  @media (min-width: 1100px) {
+    .case-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 224px;
+      align-items: start;
+      gap: clamp(56px, 6vw, 112px);
+    }
+
+    .toc-col {
+      display: block;
+      position: sticky;
+      top: calc(var(--nav-offset) + 12px);
+    }
+  }
+
+  /* ------------------------------------------------------------------- Pied */
+
+  .case-foot {
+    margin-top: clamp(80px, 9vw, 140px);
+  }
+
+  /* ------------------------------------------------------------- Responsive */
+
+  @media (max-width: 899px) {
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 18px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .fact-link {
+      min-height: 44px;
+      margin-block: -12px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .facts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .facts div {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .facts dd {
+      margin: 0;
+    }
+
+    .fact-link {
+      min-height: 44px;
+      margin-block: -12px;
+    }
+  }
+</style>

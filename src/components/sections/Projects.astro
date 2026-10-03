@@ -1,7 +1,179 @@
 ---
-// STUB — remplacé par un agent de construction.
+/**
+ * 03 — Projets : bento de 4 colonnes (2 sous 980 px).
+ * Ordre : vedette 2×2, DeepVision, Single Digital Gateway, radar « Mons. » 2×1,
+ * journal des hackathons 3×1, portfolio 1×1.
+ * Un halo ambre suit le pointeur le long de la bordure de toutes les tuiles.
+ */
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import FeatureTile from '../projects/FeatureTile.astro';
+import HackathonTile from '../projects/HackathonTile.astro';
+import RadarTile from '../projects/RadarTile.astro';
+import HackathonLog from '../projects/HackathonLog.astro';
+import PortfolioTile from '../projects/PortfolioTile.astro';
+import { PROFILE, PROJECT_TILES, SECTIONS, type ProjectTile } from '../../data/site';
+
+function tile(id: ProjectTile['id']): ProjectTile {
+  const found = PROJECT_TILES.find((t) => t.id === id);
+  if (!found) throw new Error(`Projet introuvable : ${id}`);
+  return found;
+}
+
+const { index, label } = SECTIONS.projets;
 ---
 
-<section id="projets">
-  <h2>Projets</h2>
-</section>
+<Section id="projets" index={index} label={label}>
+  <Fragment slot="title">
+    Des choses que j’ai <em class="serif">construites</em>.
+  </Fragment>
+  <a slot="aside" class="link-arrow" href={PROFILE.github} target="_blank" rel="noopener">
+    Tout sur GitHub<span class="visually-hidden"> (nouvel onglet)</span>
+    <Icon name="arrow-up-right" size={16} />
+  </a>
+
+  <div class="bento" data-bento>
+    <FeatureTile />
+    <HackathonTile tile={tile('deepvision')} />
+    <HackathonTile tile={tile('sdg')} />
+    <RadarTile />
+    <HackathonLog />
+    <PortfolioTile tile={tile('portfolio')} />
+  </div>
+</Section>
+
+<script>
+  // Halo de bordure : --mx / --my de chaque tuile suivent le pointeur (souris ou stylet).
+  // Un seul rAF par mouvement ; positions des tuiles relues seulement après un
+  // défilement ou un redimensionnement (lectures groupées, puis écritures).
+  const bento = document.querySelector<HTMLElement>('[data-bento]');
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (bento) {
+    const tiles = Array.from(bento.querySelectorAll<HTMLElement>('[data-tile]'));
+    const n = tiles.length;
+    const left = new Float64Array(n);
+    const top = new Float64Array(n);
+    let cx = 0;
+    let cy = 0;
+    let inside = false;
+    let stale = true;
+    let frame = 0;
+
+    const paint = () => {
+      frame = 0;
+      const sx = window.scrollX;
+      const sy = window.scrollY;
+      if (stale) {
+        for (let i = 0; i < n; i++) {
+          const r = tiles[i].getBoundingClientRect();
+          left[i] = r.left + sx;
+          top[i] = r.top + sy;
+        }
+        stale = false;
+      }
+      const px = cx + sx;
+      const py = cy + sy;
+      for (let i = 0; i < n; i++) {
+        const s = tiles[i].style;
+        s.setProperty('--mx', `${(px - left[i]).toFixed(1)}px`);
+        s.setProperty('--my', `${(py - top[i]).toFixed(1)}px`);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(paint);
+    };
+
+    bento.addEventListener(
+      'pointermove',
+      (e) => {
+        if (e.pointerType === 'touch' || !fine.matches) return;
+        cx = e.clientX;
+        cy = e.clientY;
+        inside = true;
+        schedule();
+      },
+      { passive: true },
+    );
+    bento.addEventListener(
+      'pointerenter',
+      () => {
+        stale = true;
+      },
+      { passive: true },
+    );
+    bento.addEventListener(
+      'pointerleave',
+      () => {
+        inside = false;
+      },
+      { passive: true },
+    );
+    window.addEventListener(
+      'scroll',
+      () => {
+        stale = true;
+        if (inside) schedule();
+      },
+      { passive: true },
+    );
+    window.addEventListener(
+      'resize',
+      () => {
+        stale = true;
+      },
+      { passive: true },
+    );
+  }
+</script>
+
+<style>
+  .bento {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(248px, auto);
+    gap: 16px;
+  }
+
+  .bento > :global(.tile--feature) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .bento > :global(.tile--radar) {
+    grid-column: span 2;
+  }
+
+  .bento > :global(.tile--log) {
+    grid-column: span 3;
+  }
+
+  @media (max-width: 980px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bento > :global(.tile--log),
+    .bento > :global(.tile--port) {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .bento {
+      gap: 12px;
+      grid-auto-rows: minmax(208px, auto);
+    }
+
+    .bento > :global(.tile--feature) {
+      grid-row: span 1;
+    }
+
+    /* Les tuiles DeepVision / SDG affichent leur description : pleine largeur. */
+    .bento > :global(.tile--sm) {
+      grid-column: span 2;
+    }
+  }
+</style>

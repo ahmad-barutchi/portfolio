@@ -1,0 +1,187 @@
+---
+/**
+ * Figure de l'étude de cas : une capture (ou trois écrans de téléphone côte à
+ * côte), légende mono numérotée. Chaque image est un bouton qui l'ouvre dans la
+ * visionneuse (ImageViewer.astro, script délégué sur [data-zoom]).
+ * La page ne rend la figure que si au moins un fichier existe (caseImage()).
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import Icon from '../Icon.astro';
+
+interface Props {
+  images: ReadonlyArray<{ src: ImageMetadata; alt: string }>;
+  caption: string;
+  /** Numéro de figure, affiché « Fig. 01 ». */
+  num: number;
+  layout?: 'single' | 'phones';
+}
+
+const { images, caption, num, layout = 'single' } = Astro.props;
+const label = `Fig. ${String(num).padStart(2, '0')}`;
+const phones = layout === 'phones';
+
+// Largeurs du srcset plafonnées à la largeur d'origine (pas d'agrandissement).
+const steps = phones ? [240, 360, 540, 720, 1080] : [480, 800, 1200, 1600, 2000];
+const widthsFor = (w: number) => [...steps.filter((s) => s < w), w];
+const sizes = phones
+  ? '(min-width: 1100px) 300px, calc((100vw - 64px) / 3)'
+  : '(min-width: 1100px) 970px, 100vw';
+---
+
+<figure class:list={['fig', phones && 'fig--phones']}>
+  <div class="fig-media">
+    {images.map((img) => (
+      <button
+        type="button"
+        class="fig-zoom"
+        data-zoom
+        data-num={label}
+        data-caption={caption}
+        aria-label={`Agrandir l’image : ${img.alt}`}
+        style={`--ratio: ${(img.src.width / img.src.height).toFixed(4)}`}
+      >
+        <Picture
+          src={img.src}
+          alt={img.alt}
+          formats={['avif']}
+          fallbackFormat="webp"
+          widths={widthsFor(img.src.width)}
+          sizes={sizes}
+          loading="lazy"
+          decoding="async"
+        />
+        <span class="fig-hint">
+          <Icon name="zoom" size={16} />
+        </span>
+      </button>
+    ))}
+  </div>
+  <figcaption>
+    <span class="mono fig-num">{label}</span>
+    <span class="fig-cap">{caption}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .fig {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 12px 0 8px;
+  }
+
+  .fig-media {
+    display: grid;
+    gap: 14px;
+  }
+
+  .fig--phones .fig-media {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(8px, 2vw, 18px);
+    max-width: 920px;
+  }
+
+  .fig-zoom {
+    position: relative;
+    display: block;
+    width: 100%;
+    /* Hauteur plafonnée (~78 vh) : une capture verticale ne prend pas tout l'écran. */
+    max-width: min(100%, calc(min(78vh, 820px) * var(--ratio, 1.6)));
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-m);
+    background: var(--bg-3);
+    box-shadow: var(--shadow-card);
+    cursor: zoom-in;
+    transition:
+      border-color 0.3s,
+      transform 0.4s var(--ease),
+      box-shadow 0.4s var(--ease);
+  }
+
+  .fig--phones .fig-zoom {
+    max-width: 100%;
+    border-radius: 18px;
+  }
+
+  .fig-zoom :global(picture) {
+    display: block;
+  }
+
+  .fig-zoom :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fig-hint {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: color-mix(in oklch, var(--bg) 78%, transparent);
+    color: var(--fg);
+    opacity: 0;
+    transform: scale(0.9);
+    transition:
+      opacity 0.25s,
+      transform 0.35s var(--ease),
+      background-color 0.25s,
+      color 0.25s,
+      border-color 0.25s;
+  }
+
+  .fig-zoom:hover,
+  .fig-zoom:focus-visible {
+    border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+  }
+
+  .fig-zoom:hover .fig-hint,
+  .fig-zoom:focus-visible .fig-hint {
+    opacity: 1;
+    transform: none;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .fig-zoom:focus-visible {
+    outline-offset: 4px;
+    border-radius: var(--radius-m);
+  }
+
+  /* Sans survol (tactile) : la pastille reste visible pour signaler le zoom. */
+  @media (hover: none) {
+    .fig-hint {
+      opacity: 1;
+      transform: none;
+      width: 32px;
+      height: 32px;
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  figcaption {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    max-width: 68ch;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .fig-num {
+    flex: none;
+    color: var(--accent-text);
+  }
+</style>

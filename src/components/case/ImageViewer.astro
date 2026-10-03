@@ -1,0 +1,176 @@
+---
+/**
+ * Visionneuse d'image : un seul <dialog> modal (top layer) par page.
+ * Un clic sur un bouton [data-zoom] (CaseFigure.astro) clone son <picture>
+ * dans la visionneuse avec sizes="100vw" (le navigateur choisit la plus grande
+ * source), l'image est contenue (object-fit: contain).
+ * Fermeture : Échap (natif), bouton ✕, clic en dehors de la légende.
+ * Le focus revient sur la figure d'origine.
+ */
+import Icon from '../Icon.astro';
+---
+
+<dialog class="viewer" aria-labelledby="viewer-legende" data-viewer>
+  <div class="viewer-stage" data-viewer-stage></div>
+  <p class="viewer-cap" id="viewer-legende">
+    <span class="mono viewer-num" data-viewer-num></span>
+    <span data-viewer-text></span>
+  </p>
+  <button type="button" class="viewer-close" aria-label="Fermer l’image" autofocus>
+    <Icon name="close" size={20} />
+  </button>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-viewer]');
+
+  if (dialog) {
+    const stage = dialog.querySelector<HTMLElement>('[data-viewer-stage]')!;
+    const num = dialog.querySelector<HTMLElement>('[data-viewer-num]')!;
+    const text = dialog.querySelector<HTMLElement>('[data-viewer-text]')!;
+    let opener: HTMLElement | null = null;
+
+    document.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLElement>('[data-zoom]');
+      const picture = button?.querySelector('picture');
+      if (!button || !picture) return;
+
+      const clone = picture.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('source, img').forEach((node) => node.setAttribute('sizes', '100vw'));
+      clone.querySelector('img')?.setAttribute('loading', 'eager');
+      stage.replaceChildren(clone);
+      num.textContent = button.dataset.num ?? '';
+      text.textContent = button.dataset.caption ?? '';
+      opener = button;
+      dialog.showModal();
+    });
+
+    // Tout clic ferme (image, fond, bouton ✕), sauf sur la légende (sélection de texte).
+    dialog.addEventListener('click', (event) => {
+      if (!(event.target as Element).closest('.viewer-cap')) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => {
+      opener?.focus();
+      opener = null;
+    });
+  }
+</script>
+
+<style>
+  .viewer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: clamp(68px, 7vw, 88px) clamp(16px, 3vw, 40px) clamp(16px, 2.4vw, 32px);
+    border: 0;
+    background: transparent;
+    color: var(--fg);
+    cursor: zoom-out;
+    opacity: 0;
+    transition:
+      opacity 0.24s var(--ease),
+      overlay 0.24s allow-discrete,
+      display 0.24s allow-discrete;
+  }
+
+  .viewer[open] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 16px;
+    opacity: 1;
+  }
+
+  @starting-style {
+    .viewer[open] {
+      opacity: 0;
+    }
+  }
+
+  .viewer::backdrop {
+    background: color-mix(in oklch, var(--bg) 95%, transparent);
+  }
+
+  /* La rangée minmax(0, 1fr) donne à la scène une hauteur définie ; l'image la
+     remplit et s'y contient (object-fit), quelle que soit sa proportion. */
+  .viewer-stage {
+    position: relative;
+    min-height: 0;
+  }
+
+  .viewer-stage :global(img) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: scale 0.4s var(--ease);
+  }
+
+  @starting-style {
+    .viewer[open] .viewer-stage :global(img) {
+      scale: 0.96;
+    }
+  }
+
+  .viewer-cap {
+    justify-self: center;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    max-width: 72ch;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--fg-2);
+    text-align: left;
+    cursor: auto;
+  }
+
+  .viewer-num {
+    flex: none;
+    color: var(--accent-text);
+  }
+
+  .viewer-close {
+    position: absolute;
+    top: clamp(12px, 2vw, 24px);
+    right: clamp(12px, 2vw, 24px);
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: var(--bg-2);
+    color: var(--fg);
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .viewer-close:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .viewer-close:focus-visible {
+    border-radius: 999px;
+  }
+
+  /* Pas de défilement de la page derrière la visionneuse. */
+  :global(html:has(dialog[data-viewer][open])) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+</style>

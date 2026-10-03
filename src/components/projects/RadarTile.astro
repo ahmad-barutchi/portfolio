@@ -1,0 +1,263 @@
+---
+/**
+ * Tuile radar « Mons. » (2×1) : la base, les langues, et un radar CSS dont le
+ * balayage (4 s) allume tour à tour les lieux où Ahmad a travaillé, étudié ou
+ * participé à des hackathons (chaque point a un animation-delay = angle / 360 × 4 s).
+ * Le radar est décoratif ; une liste masquée nomme les villes pour les lecteurs d'écran.
+ */
+import Tile from './Tile.astro';
+import { PROFILE, RADAR, RADAR_PLACES } from '../../data/site';
+
+const places = RADAR_PLACES.map((p) => ({
+  ...p,
+  style: `--x: ${p.x}; --y: ${p.y}; --d: ${p.delay}s`,
+  below: 'labelBelow' in p && p.labelBelow,
+}));
+---
+
+<Tile variant="radar" aria-labelledby="projet-radar-titre">
+  <div class="layout">
+    <div class="copy">
+      <p class="mono">
+        {RADAR.kicker} · {PROFILE.country}
+      </p>
+      <div>
+        <h3 id="projet-radar-titre" class="h3-xl">
+          {PROFILE.city}
+          <span class="dot-accent">.</span>
+        </h3>
+        <p class="sub">{RADAR.caption}</p>
+      </div>
+      <ul class="chips" aria-label="Langues">
+        {PROFILE.languages.map((l) => (
+          <li>
+            <span aria-hidden="true">
+              {l.code} · {l.level}
+            </span>
+            <span class="visually-hidden">
+              {l.name}, niveau {l.level}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="radar" aria-hidden="true">
+      <div class="sweep"></div>
+      <span class="blip home">
+        <span class="lbl">{PROFILE.city}</span>
+      </span>
+      {places.map((p) => (
+        <span class:list={['blip', { below: p.below }]} style={p.style}>
+          <span class="lbl">{p.code}</span>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <ul class="visually-hidden" aria-label={`Lieux autour de ${PROFILE.city}`}>
+    {places.map((p) => (
+      <li>{p.name}</li>
+    ))}
+  </ul>
+</Tile>
+
+<style>
+  .layout {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    min-width: 0;
+    max-width: 17rem;
+  }
+
+  .radar {
+    /* --k : échelle du radar (1 = 200 px, ≈ 0,75 px/km depuis Mons). */
+    --k: 1;
+    --size: calc(200px * var(--k));
+    position: relative;
+    z-index: 1;
+    flex: 0 0 var(--size);
+    width: var(--size);
+    height: var(--size);
+    align-self: center;
+    margin-right: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--line-2);
+    background:
+      repeating-radial-gradient(
+        circle at 50% 50%,
+        transparent 0 calc(32px * var(--k)),
+        var(--line) calc(32px * var(--k)) calc(32px * var(--k) + 1px)
+      ),
+      linear-gradient(var(--line), var(--line)) 50% 50% / 1px 100% no-repeat,
+      linear-gradient(var(--line), var(--line)) 50% 50% / 100% 1px no-repeat;
+  }
+
+  .sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 285deg,
+      color-mix(in oklch, var(--accent) 38%, transparent) 360deg
+    );
+    animation: proj-sweep 4s linear infinite;
+  }
+
+  .blip {
+    position: absolute;
+    left: calc(50% + var(--x, 0) * var(--k) * 1px);
+    top: calc(50% + var(--y, 0) * var(--k) * 1px);
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+  }
+
+  /* Le point s'allume au passage du balayage ; l'étiquette reste lisible. */
+  .blip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.4;
+    animation: proj-blip 4s linear var(--d, 0s) infinite;
+  }
+
+  .lbl {
+    position: absolute;
+    left: 10px;
+    top: -3px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: var(--fg-2);
+    white-space: nowrap;
+    opacity: 0.85;
+    animation: proj-label 4s linear var(--d, 0s) infinite;
+  }
+
+  .blip.below .lbl {
+    left: -8px;
+    top: 9px;
+  }
+
+  .blip.home {
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+  }
+
+  .blip.home::before {
+    opacity: 1;
+    animation: none;
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  .blip.home .lbl {
+    left: auto;
+    right: 14px;
+    top: -1px;
+    color: var(--fg);
+    opacity: 1;
+    animation: none;
+  }
+
+  .blip.home::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    animation: sig-ping 2.4s var(--ease) infinite;
+  }
+
+  @keyframes proj-sweep {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes proj-blip {
+    0%,
+    2% {
+      opacity: 1;
+      transform: scale(1.7);
+    }
+    30% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes proj-label {
+    0%,
+    2% {
+      opacity: 1;
+    }
+    30%,
+    100% {
+      opacity: 0.85;
+    }
+  }
+
+  /* Tuile plus étroite entre 981 et 1150 px : radar réduit. */
+  @media (min-width: 981px) and (max-width: 1150px) {
+    .radar {
+      --k: 0.8;
+      margin-right: 6px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .layout {
+      flex-direction: column;
+    }
+
+    .copy {
+      max-width: none;
+    }
+
+    .radar {
+      margin: 6px auto 4px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sweep,
+    .blip::before,
+    .lbl,
+    .blip.home::after {
+      animation: none;
+    }
+
+    .blip::before {
+      opacity: 0.7;
+    }
+
+    .blip.home::before {
+      opacity: 1;
+    }
+
+    .blip.home::after {
+      opacity: 0;
+    }
+  }
+</style>

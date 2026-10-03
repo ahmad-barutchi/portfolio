@@ -1,11 +1,226 @@
 ---
-// STUB — remplacé par l'agent « hero ».
+/**
+ * 404 « Signal perdu » : même champ de points que le hero (il balaie, mais ne
+ * réagit plus au pointeur), « 404 » géant, retour à l'accueil.
+ * Firebase Hosting sert dist/404.html pour toute adresse inconnue.
+ */
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import SignalField from '../components/hero/SignalField.astro';
+import PacketRule from '../components/hero/PacketRule.astro';
+import { PROFILE } from '../data/site';
 ---
 
-<Base title="Page introuvable — Ahmad Barutchi" path="/404" noindex>
-  <section>
-    <h1>404 — Signal perdu.</h1>
-    <a href="/">Retour à l'accueil</a>
+<Base
+  title={`Signal perdu — ${PROFILE.name}`}
+  description="Cette page n’existe pas ou a changé d’adresse."
+  path="/404"
+  noindex
+>
+  <section class="lost" aria-labelledby="perdu-titre">
+    <SignalField interactive={false} />
+
+    <div class="lost-inner">
+      <p class="mono tele fade">
+        <span class="lost-dot" aria-hidden="true"></span>
+        <span class="err">ERR</span> · 404 · <span data-clock>--:--</span> · {PROFILE.city}
+      </p>
+
+      <h1 id="perdu-titre" class="lost-title">
+        <span class="mask">
+          <span class="rise code">404</span>
+        </span>{' '}
+        <span class="mask">
+          <span class="rise rise-2 phrase">
+            Signal <em class="serif">perdu</em>
+            <span class="dot-accent">.</span>
+          </span>
+        </span>
+      </h1>
+
+      <PacketRule />
+
+      <div class="lost-foot">
+        <p class="lede fade fade-1">
+          Cette adresse ne mène nulle part&nbsp;: la page a été déplacée, ou n’a jamais existé.
+        </p>
+        <div class="cta fade fade-2">
+          <a class="btn btn-primary" href="/" data-magnetic>
+            <Icon name="arrow-left" />
+            Retour à l’accueil
+          </a>
+        </div>
+      </div>
+    </div>
   </section>
 </Base>
+
+<style>
+  .lost {
+    --tick-top: 104px;
+    --tick-bottom: 44px;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: max(600px, 100svh);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 150px var(--gutter) 104px;
+  }
+
+  .lost-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .tele {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0 0.6em;
+    margin-bottom: -12px;
+    color: var(--fg-2);
+  }
+
+  .err {
+    color: var(--accent-text);
+  }
+
+  /* Balise « perdue » : un anneau creux qui clignote lentement. */
+  .lost-dot {
+    width: 8px;
+    height: 8px;
+    margin-right: 4px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    animation: lost-blink 1.8s steps(1, end) infinite;
+  }
+
+  @keyframes lost-blink {
+    50% {
+      opacity: 0.2;
+    }
+  }
+
+  .lost-title {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.4vw, 18px);
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .mask {
+    display: block;
+    overflow: hidden;
+    padding: 0 0.06em 0.09em 0;
+    margin-bottom: -0.09em;
+  }
+
+  .rise {
+    display: inline-block;
+    animation: lost-rise 1.15s var(--ease) 0.1s both;
+  }
+
+  .rise-2 {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes lost-rise {
+    from {
+      transform: translateY(108%);
+    }
+  }
+
+  .code {
+    font-size: clamp(120px, 26vw, 340px);
+    line-height: 0.82;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .phrase {
+    font-size: clamp(40px, 5.6vw, 84px);
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .fade {
+    animation: sig-fadeup 0.9s var(--ease) both;
+  }
+
+  .fade-1 {
+    animation-delay: 0.55s;
+  }
+
+  .fade-2 {
+    animation-delay: 0.68s;
+  }
+
+  .lost-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px 40px;
+  }
+
+  .lede {
+    max-width: 36ch;
+    font-size: clamp(18px, 1.6vw, 23px);
+    line-height: 1.5;
+    letter-spacing: -0.012em;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .btn-primary {
+    transition:
+      translate 0.16s var(--ease),
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease),
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .btn-primary:hover :global(.ic) {
+    transform: translateX(-3px);
+  }
+
+  @media (max-width: 620px) {
+    .lost {
+      padding: 132px 20px 72px;
+    }
+
+    .lost-inner {
+      gap: 32px;
+    }
+
+    .code {
+      font-size: 40vw;
+    }
+
+    .lede {
+      font-size: 18px;
+    }
+
+    .cta,
+    .btn-primary {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  import { magnetize } from '../components/hero/magnetic';
+
+  const host = document.querySelector<HTMLElement>('.lost');
+  host?.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => magnetize(el, host));
+</script>

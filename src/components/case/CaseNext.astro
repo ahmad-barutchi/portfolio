@@ -1,0 +1,264 @@
+---
+/**
+ * Pied de l'étude de cas : grande carte « Projet suivant » (lien externe vers
+ * le dépôt du projet, nouvel onglet) et retour à la grille des projets.
+ * Pour DeepVision, le glyphe d'iris de sa tuile du bento, en grand.
+ */
+import Icon from '../Icon.astro';
+import type { ProjectTile } from '../../data/site';
+import { frenchSpacing } from '../../data/case-robot';
+
+interface Props {
+  project: ProjectTile;
+  /** Ancre de la grille des projets sur l'accueil. */
+  backHref: string;
+}
+
+const { project, backHref } = Astro.props;
+---
+
+<nav class="next" aria-label="Autres projets">
+  <a
+    class="next-card"
+    href={project.href}
+    target="_blank"
+    rel="noopener"
+    aria-labelledby="suivant-kicker suivant-titre"
+    aria-describedby="suivant-desc"
+  >
+    <span class="next-top">
+      <span class="mono next-kicker" id="suivant-kicker">
+        Projet suivant
+        <Icon name="arrow-right" size={14} />
+      </span>
+      <span class="go" aria-hidden="true">
+        <Icon name="arrow-up-right" size={18} />
+      </span>
+    </span>
+    <span class="next-title" id="suivant-titre">
+      {project.title}
+      <span class="dot-accent" aria-hidden="true">
+        .
+      </span>
+      <span class="visually-hidden"> sur GitHub (nouvel onglet)</span>
+    </span>
+    <span class="mono next-meta">
+      {project.meta} · {project.sub}
+    </span>
+    <span class="next-desc" id="suivant-desc">
+      {frenchSpacing(project.description)}
+    </span>
+    <span class="next-chips" aria-hidden="true">
+      {project.stack.map((tech) => (
+        <span class="chip">{tech}</span>
+      ))}
+    </span>
+    {project.id === 'deepvision' && (
+      <svg class="iris" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+        <circle class="ring dash" cx="60" cy="60" r="56" />
+        <circle class="ring" cx="60" cy="60" r="40" />
+        <circle class="ring" cx="60" cy="60" r="24" />
+        <circle class="pupil" cx="60" cy="60" r="9" />
+      </svg>
+    )}
+  </a>
+
+  <a class="link-quiet back" href={backHref}>
+    <Icon name="arrow-left" size={16} />
+    Tous les projets
+  </a>
+</nav>
+
+<style>
+  .next {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .next-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    padding: clamp(24px, 3.4vw, 44px);
+    border-radius: var(--radius-l);
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    color: var(--fg);
+    text-decoration: none;
+    transition:
+      border-color 0.3s,
+      background-color 0.45s var(--ease);
+  }
+
+  /* Lueur ambre douce dans le coin, plus présente au survol. */
+  .next-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      620px circle at 100% 0%,
+      color-mix(in oklch, var(--accent) 9%, transparent),
+      transparent 62%
+    );
+    opacity: 0.6;
+    transition: opacity 0.35s;
+  }
+
+  .next-card:hover {
+    border-color: color-mix(in oklch, var(--accent) 45%, transparent);
+  }
+
+  .next-card:hover::after {
+    opacity: 1;
+  }
+
+  .next-card:focus-visible {
+    border-radius: var(--radius-l);
+  }
+
+  .next-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: clamp(12px, 3vw, 40px);
+  }
+
+  .next-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--fg-2);
+  }
+
+  .go {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    color: var(--fg-2);
+    transition:
+      background-color 0.25s,
+      color 0.25s,
+      border-color 0.25s,
+      transform 0.35s var(--ease);
+  }
+
+  .go :global(.ic) {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .next-card:hover .go {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink);
+    transform: scale(1.06);
+  }
+
+  .next-card:hover .go :global(.ic) {
+    transform: translate(2px, -2px);
+  }
+
+  .next-title {
+    font-weight: 600;
+    font-size: clamp(44px, 6vw, 88px);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+
+  .next-meta {
+    color: var(--fg-2);
+  }
+
+  .next-desc {
+    max-width: 60ch;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .next-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  /* Glyphe d'iris (DeepVision), à droite sur grand écran. */
+  .iris {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .iris {
+      display: block;
+      position: absolute;
+      z-index: -1;
+      right: clamp(48px, 7vw, 120px);
+      top: 50%;
+      width: clamp(150px, 17vw, 240px);
+      height: auto;
+      translate: 0 -42%;
+      color: var(--fg-3);
+    }
+
+    .next-desc {
+      max-width: min(60ch, calc(100% - clamp(150px, 17vw, 240px) - 64px));
+    }
+  }
+
+  .iris .ring {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 0.8;
+    opacity: 0.7;
+  }
+
+  .iris .dash {
+    stroke-dasharray: 3 5;
+    transform-origin: 60px 60px;
+    animation: iris-turn 30s linear infinite;
+  }
+
+  .iris .pupil {
+    fill: var(--accent);
+    transform-origin: 60px 60px;
+    transition: transform 0.6s var(--ease);
+  }
+
+  .next-card:hover .iris .pupil,
+  .next-card:focus-visible .iris .pupil {
+    transform: scale(1.7);
+  }
+
+  @keyframes iris-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .iris .dash {
+      animation: none;
+    }
+  }
+
+  .back {
+    min-height: 44px;
+  }
+
+  .back:hover :global(.ic) {
+    transform: translateX(-3px);
+  }
+</style>

@@ -1,0 +1,166 @@
+---
+/**
+ * Tuile du bento « Projets » : surface, halo ambre de bordure qui suit le
+ * pointeur (--mx / --my posés par le script de Projects.astro), lueur
+ * intérieure, et la pastille ronde ↗ (.go) des tuiles-liens.
+ * Rendue en <a> si `href` est fourni (lien externe : nouvel onglet), sinon en <article>.
+ * La mise en place dans la grille se fait dans Projects.astro via la classe tile--{variant}.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Variant = 'feature' | 'sm' | 'radar' | 'log' | 'port';
+
+type Props = Omit<HTMLAttributes<'a'>, 'class'> & {
+  variant: Variant;
+  class?: string;
+};
+
+const { variant, href, class: className, ...rest } = Astro.props;
+const Tag = href ? 'a' : 'article';
+const external = typeof href === 'string' && /^https?:\/\//.test(href);
+---
+
+<Tag
+  class:list={['tile', `tile--${variant}`, 'reveal', className]}
+  data-tile
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener' : undefined}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style>
+  .tile {
+    --mx: 50%;
+    --my: 50%;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    min-width: 0;
+    padding: 28px;
+    border-radius: var(--radius-l);
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    color: var(--fg);
+    text-decoration: none;
+    transition:
+      border-color 0.3s,
+      background-color 0.45s var(--ease);
+  }
+
+  /* Halo de bordure : un dégradé radial masqué pour n'éclairer que le contour. */
+  .tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      300px circle at var(--mx) var(--my),
+      var(--accent),
+      transparent 65%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+  }
+
+  /* Lueur intérieure douce, sous le contenu. */
+  .tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      460px circle at var(--mx) var(--my),
+      color-mix(in oklch, var(--accent) 8%, transparent),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :global([data-bento]:hover) .tile::before {
+      opacity: 0.95;
+    }
+
+    :global([data-bento]:hover) .tile::after {
+      opacity: 1;
+    }
+  }
+
+  a.tile:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .tile--feature {
+    justify-content: flex-start;
+    padding: 30px;
+  }
+
+  .tile--log {
+    justify-content: flex-start;
+    gap: 14px;
+  }
+
+  /* Pastille ↗ des tuiles-liens (placée par chaque tuile). */
+  .tile :global(.go) {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    color: var(--fg-2);
+    transition:
+      background-color 0.25s,
+      color 0.25s,
+      border-color 0.25s,
+      transform 0.35s var(--ease);
+  }
+
+  .tile :global(.go .ic) {
+    transition: transform 0.35s var(--ease);
+  }
+
+  .tile:hover :global(.go),
+  .tile:focus-visible :global(.go) {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink);
+    transform: scale(1.06);
+  }
+
+  .tile:hover :global(.go .ic),
+  .tile:focus-visible :global(.go .ic) {
+    transform: translate(1px, -1px);
+  }
+
+  @media (max-width: 620px) {
+    .tile,
+    .tile--feature {
+      padding: 22px;
+      border-radius: 18px;
+    }
+  }
+</style>

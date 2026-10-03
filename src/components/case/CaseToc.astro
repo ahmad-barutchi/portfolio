@@ -1,0 +1,188 @@
+---
+/**
+ * Sommaire collant de l'étude de cas (affiché à partir de 1100 px).
+ * La section active est la dernière dont le haut a franchi une ligne à 22 % de
+ * la hauteur de la fenêtre (IntersectionObserver, aucun calcul au scroll) ; son
+ * lien reçoit aria-current, et le chapitre parent s'éclaire via :has().
+ * Les cibles observées sont les éléments [data-toc-target="<id>"] de la page.
+ */
+export type TocItem = {
+  id: string;
+  label: string;
+  num?: string;
+  children?: ReadonlyArray<{ id: string; label: string }>;
+};
+
+interface Props {
+  items: readonly TocItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="toc" aria-labelledby="sommaire-titre" data-toc>
+  <p class="mono toc-title" id="sommaire-titre">
+    Sommaire
+  </p>
+  <ol class="toc-list">
+    {items.map((item) => (
+      <li>
+        <a href={`#${item.id}`} data-toc-link={item.id}>
+          {item.num && <span class="toc-num">{item.num}</span>}
+          {item.label}
+        </a>
+        {item.children && item.children.length > 0 && (
+          <ol class="toc-sub">
+            {item.children.map((child) => (
+              <li>
+                <a href={`#${child.id}`} data-toc-link={child.id}>
+                  {child.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script>
+  const toc = document.querySelector<HTMLElement>('[data-toc]');
+  const targets = Array.from(document.querySelectorAll<HTMLElement>('[data-toc-target]'));
+
+  if (toc && targets.length && 'IntersectionObserver' in window) {
+    const links = new Map<string, HTMLAnchorElement>();
+    toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]').forEach((a) => {
+      links.set(a.dataset.tocLink!, a);
+    });
+    // passed[i] : le haut de la section i a franchi la ligne (22 % de la hauteur).
+    const passed = targets.map(() => false);
+    let current: HTMLAnchorElement | null = null;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          passed[targets.indexOf(entry.target as HTMLElement)] = entry.isIntersecting;
+        }
+        // Ordre du document : une sous-section passe après son chapitre.
+        const index = passed.lastIndexOf(true);
+        const link = index >= 0 ? (links.get(targets[index].dataset.tocTarget!) ?? null) : null;
+        if (link === current) return;
+        current?.removeAttribute('aria-current');
+        link?.setAttribute('aria-current', 'true');
+        current = link;
+      },
+      // Zone observée : tout ce qui est au-dessus de la ligne, y compris hors écran
+      // (une section « intersecte » dès que son haut a franchi la ligne, même après un saut).
+      { rootMargin: '99999px 0px -78% 0px' },
+    );
+
+    targets.forEach((target) => observer.observe(target));
+  }
+</script>
+
+<style>
+  .toc {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .toc-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .toc-title::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .toc-list,
+  .toc-sub {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-list {
+    border-left: 1px solid var(--line-2);
+  }
+
+  .toc a {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 0 7px 18px;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--fg-3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .toc-sub a {
+    padding-block: 5px;
+    padding-left: 44px;
+    font-size: 13.5px;
+  }
+
+  /* Barre active sur le rail. */
+  .toc a::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.3s var(--ease);
+  }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-3);
+    transition: color 0.2s;
+  }
+
+  .toc a:hover {
+    color: var(--fg);
+  }
+
+  .toc a:focus-visible {
+    border-radius: 6px;
+    outline-offset: 0;
+  }
+
+  .toc a[aria-current] {
+    color: var(--fg);
+  }
+
+  .toc a[aria-current]::before {
+    transform: scaleY(1);
+  }
+
+  .toc a[aria-current] .toc-num,
+  .toc li:has(.toc-sub a[aria-current]) > a .toc-num {
+    color: var(--accent-text);
+  }
+
+  /* Chapitre parent d'une sous-section active. */
+  .toc li:has(.toc-sub a[aria-current]) > a {
+    color: var(--fg);
+  }
+</style>

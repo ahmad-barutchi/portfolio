@@ -217,6 +217,7 @@ export const FEATURED_PROJECT = {
   slug: 'robot-secouriste',
   href: '/projets/robot-secouriste',
   meta: 'TFE 2022 · Binôme · IoT',
+  badge: 'Étude de cas',
   /** Le second mot passe en serif italique. */
   titleStart: 'Robot',
   titleEm: 'secouriste',
@@ -269,6 +270,11 @@ export const PROJECT_TILES: readonly ProjectTile[] = [
     stack: ['Astro', 'TypeScript', 'CSS'],
   },
 ];
+
+export const RADAR = {
+  kicker: 'Base',
+  caption: 'Là où j’ai travaillé, étudié et participé à des hackathons.',
+} as const;
 
 /**
  * Tuile radar « Mons. » : lieux où Ahmad a travaillé, étudié ou participé à des hackathons.

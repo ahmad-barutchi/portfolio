@@ -1,0 +1,75 @@
+---
+/**
+ * Tuile 1×1 « Portfolio » (ce site) : monogramme géant, méta, titre, techno ;
+ * la tuile entière mène au dépôt GitHub.
+ */
+import Tile from './Tile.astro';
+import Icon from '../Icon.astro';
+import type { ProjectTile } from '../../data/site';
+
+interface Props {
+  tile: ProjectTile;
+}
+
+const { tile } = Astro.props;
+const id = `projet-${tile.id}`;
+---
+
+<Tile
+  variant="port"
+  href={tile.href}
+  aria-label={`${tile.title}, code source sur GitHub (nouvel onglet)`}
+  aria-describedby={`${id}-meta ${id}-sub ${id}-desc`}
+>
+  <div class="top">
+    <p class="mono-big" aria-hidden="true">
+      ab<span class="dot-accent">.</span>
+    </p>
+    <span class="go" aria-hidden="true">
+      <Icon name="arrow-up-right" size={16} />
+    </span>
+  </div>
+  <div>
+    <p id={`${id}-meta`} class="mono">
+      {tile.meta}
+    </p>
+    <h3 class="h3">{tile.title}</h3>
+    <p id={`${id}-sub`} class="sub">
+      {tile.sub}
+    </p>
+    <span id={`${id}-desc`} class="visually-hidden">
+      {tile.description}
+    </span>
+  </div>
+</Tile>
+
+<style>
+  .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .mono-big {
+    font-weight: 650;
+    font-size: 76px;
+    line-height: 0.85;
+    letter-spacing: -0.07em;
+    color: var(--fg);
+  }
+
+  .h3 {
+    margin-top: 12px;
+  }
+
+  @media (max-width: 620px) {
+    .mono-big {
+      font-size: 58px;
+    }
+
+    .h3 {
+      font-size: 19px;
+    }
+  }
+</style>

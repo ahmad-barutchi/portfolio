@@ -1,18 +1,401 @@
 ---
-// STUB — remplacé par l'agent « shell ».
-import { NAV, type NavId } from '../data/site';
+/**
+ * Navigation « SIGNAL » : barre collante de hauteur nulle (la page passe
+ * dessous), barre de progression pilotée par le scroll (0 JS), monogramme
+ * « ab· », pilule de verre avec capsule active qui glisse, bascule de thème et
+ * lien CV. Sous 820 px, la pilule ne garde que le thème et le bouton menu, qui
+ * ouvre MobileMenu (<dialog> modal).
+ * Comportement : src/scripts/nav.ts (capsule, scroll-spy, masquage, menu) et
+ * src/scripts/theme.ts (thème, contrat « themechange »).
+ */
+import Icon from './Icon.astro';
+import MobileMenu from './shell/MobileMenu.astro';
+import { NAV, PROFILE, SECTIONS, type NavId } from '../data/site';
+
 interface Props {
+  /** Accueil : liens d'ancre locaux (#id) et scroll-spy. */
   home?: boolean;
+  /** Hors accueil : section mise en avant (aria-current="page"). */
   current?: NavId;
 }
-const { home = false } = Astro.props;
-const base = home ? '' : '/';
+
+const { home = false, current } = Astro.props;
+const pageCurrent = home ? undefined : current;
+const href = (id: NavId) => (home ? `#${id}` : `/#${id}`);
+/** Sections suivies par le scroll-spy, dans l'ordre de la page. */
+const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
 ---
 
-<header>
-  <nav aria-label="Navigation principale">
-    {NAV.map((item) => (
-      <a href={`${base}#${item.id}`}>{item.label}</a>
-    ))}
-  </nav>
+<header
+  class="navbar"
+  data-nav
+  data-home={home ? '' : undefined}
+  data-current={pageCurrent}
+  data-spy={spy}
+>
+  <div class="progress" aria-hidden="true"></div>
+  <div class="navrow">
+    <a
+      class="brand"
+      href={home ? '#accueil' : '/'}
+      aria-label={home ? 'Ahmad Barutchi, haut de page' : 'Ahmad Barutchi, accueil'}
+    >
+      ab<span class="brand-dot" aria-hidden="true"></span>
+    </a>
+
+    <nav class="pill" aria-label="Navigation principale">
+      <div class="track" data-nav-track>
+        <span class="cap" data-nav-cap aria-hidden="true"></span>
+        <ul class="links" role="list">
+          {NAV.map((item) => (
+            <li>
+              <a
+                class="nav-item"
+                href={href(item.id)}
+                data-nav-id={item.id}
+                aria-current={pageCurrent === item.id ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <span class="sep" aria-hidden="true"></span>
+      <button
+        class="icon-btn theme-btn"
+        type="button"
+        data-theme-toggle
+        aria-label="Passer au thème clair"
+      >
+        <Icon name="moon" class="theme-ic theme-moon" />
+        <Icon name="sun" class="theme-ic theme-sun" />
+      </button>
+      <a
+        class="cv"
+        href={PROFILE.cv}
+        target="_blank"
+        rel="noopener"
+        aria-label="Télécharger le CV (PDF)"
+      >
+        CV
+        <Icon name="arrow-up-right" size={14} />
+      </a>
+      <button
+        class="icon-btn menu-btn"
+        type="button"
+        data-menu-open
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+        aria-label="Ouvrir le menu"
+      >
+        <Icon name="menu" size={20} />
+      </button>
+    </nav>
+  </div>
+
+  <MobileMenu id="menu-mobile" home={home} current={current} />
 </header>
+
+<script>
+  import '../scripts/theme';
+</script>
+<script>
+  import '../scripts/nav';
+</script>
+
+<style>
+  .navbar {
+    --nav-py: 18px;
+    --nav-px: clamp(16px, 3.4vw, 48px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 0;
+  }
+
+  /* Progression de lecture : 2 px d'ambre, pilotés par le défilement, sans JS. */
+  .progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    pointer-events: none;
+  }
+
+  /* Longhands volontaires : avec le raccourci « animation », lightningcss fusionne
+     la timeline dans le raccourci, que Chromium rejette alors en bloc. */
+  @supports (animation-timeline: scroll()) {
+    .progress {
+      animation-name: nav-progress;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+    }
+  }
+
+  @keyframes nav-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .navrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    /* Au-delà de 1440 px, la barre suit la colonne de contenu (débord de 32 px,
+       comme sur la maquette à 1440 px) au lieu de rester collée aux bords. */
+    padding: var(--nav-py) max(var(--nav-px), calc((100% - var(--container)) / 2 - 32px));
+    pointer-events: none;
+    transition: transform 0.45s var(--ease);
+  }
+
+  .navrow > * {
+    pointer-events: auto;
+  }
+
+  /* Masquée en descendant (nav.ts), toujours visible si le focus y entre. */
+  .navbar[data-hidden]:not(:focus-within) .navrow {
+    transform: translateY(-120%);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    font-weight: 650;
+    font-size: 23px;
+    letter-spacing: -0.06em;
+    text-decoration: none;
+    color: var(--fg);
+  }
+
+  .brand-dot {
+    width: 7px;
+    height: 7px;
+    margin: 12px 0 0 2px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  /* Pilule de verre (seul verre du site) */
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 50px;
+    padding: 0 5px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: color-mix(in oklch, var(--bg) 70%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, var(--fg) 6%, transparent),
+      0 10px 30px -18px rgb(0 0 0 / 0.5);
+  }
+
+  .track {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Capsule active : glisse d'un lien à l'autre (transform + width). */
+  .cap {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 40px;
+    border-radius: 999px;
+    background: var(--bg-3);
+    box-shadow: inset 0 1px 0 color-mix(in oklch, var(--fg) 8%, transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cap[data-ready] {
+    transition:
+      transform 0.5s var(--ease),
+      width 0.5s var(--ease),
+      opacity 0.25s;
+  }
+
+  .nav-item {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 450;
+    color: var(--fg-2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  .nav-item:hover,
+  .nav-item[aria-current] {
+    color: var(--fg);
+  }
+
+  .nav-item:focus-visible,
+  .icon-btn:focus-visible,
+  .cv:focus-visible {
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  .sep {
+    width: 1px;
+    height: 20px;
+    margin: 0 6px;
+    background: var(--line-2);
+  }
+
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--fg-2);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .icon-btn:hover {
+    background: var(--bg-3);
+    color: var(--fg);
+  }
+
+  /* Lune en sombre, soleil en clair ; l'icône qui apparaît tourne en entrant. */
+  .theme-btn :global(.theme-ic) {
+    grid-area: 1 / 1;
+    animation: nav-spin-in 0.55s var(--ease) both;
+  }
+
+  :global(:root[data-theme='light']) .theme-btn :global(.theme-moon),
+  :global(:root:not([data-theme='light'])) .theme-btn :global(.theme-sun) {
+    display: none;
+  }
+
+  @keyframes nav-spin-in {
+    from {
+      transform: rotate(-90deg) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  .cv {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    margin-left: 4px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .cv:hover {
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .cv :global(.ic) {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .cv:hover :global(.ic) {
+    transform: translate(2px, -2px);
+  }
+
+  .menu-btn {
+    display: none;
+  }
+
+  /* Mobile et tablette : thème + menu, cibles de 44 px. */
+  @media (max-width: 820px) {
+    .track,
+    .sep,
+    .cv {
+      display: none;
+    }
+
+    .menu-btn {
+      display: grid;
+    }
+
+    .pill {
+      height: 54px;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .navbar {
+      --nav-py: 14px;
+      --nav-px: 16px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Bascule de thème en cercle (theme.ts) : la nouvelle vue est découpée par un
+     clip-path animé ; pendant ce temps, rien d'autre n'est capturé à part et
+     aucune transition de couleur ne joue dans l'instantané. */
+  :root[data-theme-switch]::view-transition-old(root),
+  :root[data-theme-switch]::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  :root[data-theme-switch] *,
+  :root[data-theme-switch] *::before,
+  :root[data-theme-switch] *::after {
+    view-transition-name: none !important;
+    transition: none !important;
+  }
+
+  /* Menu mobile ouvert : la page ne défile plus dessous. */
+  html:has(#menu-mobile[open]) {
+    overflow: hidden;
+  }
+</style>
