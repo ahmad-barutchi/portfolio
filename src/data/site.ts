@@ -1,6 +1,6 @@
 /**
  * Contenu du site — source unique de vérité.
- * Tout vient de l'ancien site (fautes corrigées) et de HANDOVER.md section 7.
+ * Tout vient de l'ancien site (fautes corrigées).
  * Les descriptions de DeepVision et Single Digital Gateway ont été vérifiées
  * dans leurs dépôts publics (README, package.json, code).
  */
@@ -43,16 +43,16 @@ export const PROFILE = {
   /** Remplacer par '/cv-ahmad-barutchi.pdf' quand le PDF est ajouté dans public/. */
   cv: 'https://drive.google.com/uc?export=download&id=1dYTCjxuQPhW2vZnqT91PAWvk5jZBQs5Q',
   languages: [
-    { code: 'FR', name: 'Français', level: 'C2' },
-    { code: 'EN', name: 'Anglais', level: 'C1' },
-    { code: 'AR', name: 'Arabe', level: 'C2' },
+    { code: 'FR', name: 'Français' },
+    { code: 'EN', name: 'Anglais' },
+    { code: 'AR', name: 'Arabe' },
   ],
   drivingLicense: 'B, depuis 2014',
 } as const;
 
 export type NavId = 'accueil' | 'a-propos' | 'parcours' | 'projets' | 'competences' | 'contact';
 
-/** Navigation principale (la section Compétences n'y figure pas, comme prévu dans le handover). */
+/** Navigation principale (la section Compétences n'y figure pas, comme prévu dans le cahier des charges). */
 export const NAV: ReadonlyArray<{ id: NavId; label: string }> = [
   { id: 'accueil', label: 'Accueil' },
   { id: 'a-propos', label: 'À propos' },
@@ -87,7 +87,7 @@ export const ABOUT = {
     'Mon travail de fin d’études était un robot secouriste qui remonte sa télémétrie vers un tableau de bord web et mobile. Depuis 2016, je donne aussi des cours particuliers d’informatique et de musique.',
   ],
   facts: [
-    { label: 'Langues', value: 'FR C2 · EN C1 · AR C2' },
+    { label: 'Langues', value: 'Trilingue · FR · EN · AR' },
     { label: 'Permis', value: 'B, depuis 2014' },
     { label: 'Base', value: 'Namur, Belgique' },
     { label: 'Enseigne', value: 'Informatique et musique' },
