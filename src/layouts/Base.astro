@@ -1,0 +1,121 @@
+---
+/**
+ * Gabarit commun : <head> (SEO, polices, thème sans flash), lien d'évitement,
+ * navigation, contenu, pied de page.
+ */
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, PROFILE, type NavId } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Chemin canonique, ex. "/" ou "/projets/robot-secouriste". */
+  path?: string;
+  ogImage?: string;
+  /** Section mise en avant dans la navigation hors de l'accueil. */
+  current?: NavId;
+  /** true sur la page d'accueil : la navigation utilise des ancres locales (#id). */
+  home?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  path = Astro.url.pathname,
+  ogImage = SITE.ogImage,
+  current,
+  home = false,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(path, SITE.url).toString();
+const ogUrl = new URL(ogImage, SITE.url).toString();
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: PROFILE.name,
+  jobTitle: PROFILE.role,
+  url: SITE.url,
+  email: `mailto:${PROFILE.email}`,
+  image: ogUrl,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: PROFILE.city,
+    postalCode: PROFILE.postalCode,
+    addressCountry: PROFILE.countryCode,
+  },
+  knowsLanguage: ['fr', 'en', 'ar'],
+  sameAs: [PROFILE.linkedin, PROFILE.github, PROFILE.apprentus],
+};
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      // Thème appliqué avant le premier rendu (pas de flash) : choix mémorisé, sinon système.
+      (function () {
+        var t = null;
+        try {
+          t = localStorage.getItem('theme');
+        } catch (e) {}
+        if (t !== 'light' && t !== 'dark') {
+          t =
+            window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+        }
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={PROFILE.name} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0b0d14" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f7f4ee" media="(prefers-color-scheme: light)" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
+
+    <Font cssVariable="--font-geist" preload />
+    <Font cssVariable="--font-geist-mono" preload />
+    <Font cssVariable="--font-instrument" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">
+      Aller au contenu
+    </a>
+    <Nav home={home} current={current} />
+    <main id="contenu" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

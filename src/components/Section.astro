@@ -1,0 +1,35 @@
+---
+/**
+ * Section éditoriale : étiquette mono « 01 — Label », titre XXL (slot "title",
+ * un mot en <em class="serif">), contenu (slot par défaut), et un slot "aside"
+ * optionnel à droite du titre.
+ */
+interface Props {
+  id: string;
+  index: string;
+  label: string;
+  class?: string;
+}
+
+const { id, index, label, class: className } = Astro.props;
+const headingId = `${id}-titre`;
+---
+
+<section id={id} class:list={['section', className]} aria-labelledby={headingId}>
+  <div class="wrap">
+    <header class="sec-head">
+      <div>
+        <p class="label">
+          <span class="label-num">{index}</span>
+          <span class="label-line" aria-hidden="true"></span>
+          {label}
+        </p>
+        <h2 id={headingId} class="h2">
+          <slot name="title" />
+        </h2>
+      </div>
+      <slot name="aside" />
+    </header>
+    <slot />
+  </div>
+</section>

@@ -1,0 +1,18 @@
+---
+// STUB — remplacé par l'agent « shell ».
+import { NAV, type NavId } from '../data/site';
+interface Props {
+  home?: boolean;
+  current?: NavId;
+}
+const { home = false } = Astro.props;
+const base = home ? '' : '/';
+---
+
+<header>
+  <nav aria-label="Navigation principale">
+    {NAV.map((item) => (
+      <a href={`${base}#${item.id}`}>{item.label}</a>
+    ))}
+  </nav>
+</header>
