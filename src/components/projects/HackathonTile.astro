@@ -9,11 +9,13 @@
 import Tile from './Tile.astro';
 import Icon from '../Icon.astro';
 import type { ProjectTile } from '../../data/site';
+import { useI18n } from '../../i18n';
 
 interface Props {
   tile: ProjectTile;
 }
 
+const { t } = useI18n(Astro);
 const { tile } = Astro.props;
 const id = `projet-${tile.id}`;
 const glyph = tile.id === 'sdg' ? 'eu' : 'iris';
@@ -32,7 +34,7 @@ const stars = Array.from({ length: 12 }, (_, i) => {
 <Tile
   variant="sm"
   href={tile.href}
-  aria-label={`${tile.title}, code source sur GitHub (nouvel onglet)`}
+  aria-label={t.projects.tileAria(tile.title)}
   aria-describedby={`${id}-meta ${id}-sub ${id}-desc`}
 >
   <div class="inner">

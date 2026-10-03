@@ -6,13 +6,16 @@
  * Le radar est décoratif ; une liste masquée nomme les villes pour les lecteurs d'écran.
  */
 import Tile from './Tile.astro';
-import { PROFILE, RADAR, RADAR_PLACES } from '../../data/site';
+import { useI18n } from '../../i18n';
+
+const { c, t } = useI18n(Astro);
+const { PROFILE, RADAR, RADAR_PLACES } = c;
 
 const places = RADAR_PLACES.map((p) => ({
   ...p,
   style: `--x: ${p.x}; --y: ${p.y}; --d: ${p.delay}s`,
-  below: 'labelBelow' in p && p.labelBelow,
-  left: 'labelLeft' in p && p.labelLeft,
+  below: p.labelBelow ?? false,
+  left: p.labelLeft ?? false,
 }));
 ---
 
@@ -29,7 +32,7 @@ const places = RADAR_PLACES.map((p) => ({
         </h3>
         <p class="sub">{RADAR.caption}</p>
       </div>
-      <ul class="chips" aria-label="Langues">
+      <ul class="chips" aria-label={t.projects.languages}>
         {PROFILE.languages.map((l) => (
           <li>
             <span aria-hidden="true">{l.code}</span>
@@ -52,7 +55,7 @@ const places = RADAR_PLACES.map((p) => ({
     </div>
   </div>
 
-  <ul class="visually-hidden" aria-label={`Lieux autour de ${PROFILE.city}`}>
+  <ul class="visually-hidden" aria-label={t.projects.placesAround(PROFILE.city)}>
     {places.map((p) => (
       <li>{p.name}</li>
     ))}

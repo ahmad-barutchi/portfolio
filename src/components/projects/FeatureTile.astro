@@ -8,9 +8,11 @@
 import Tile from './Tile.astro';
 import Icon from '../Icon.astro';
 import DashboardFrame from '../DashboardFrame.astro';
-import { FEATURED_PROJECT as P } from '../../data/site';
 import { caseImage, COVER_NAME } from '../../lib/case-images';
+import { useI18n } from '../../i18n';
 
+const { c, t } = useI18n(Astro);
+const P = c.FEATURED_PROJECT;
 const cover = caseImage(COVER_NAME);
 ---
 
@@ -25,19 +27,20 @@ const cover = caseImage(COVER_NAME);
       {P.titleStart} <em class="serif">{P.titleEm}</em>
     </h3>
     <p class="body">{P.summary}</p>
-    <ul class="chips" aria-label="Technologies">
+    <ul class="chips" aria-label={t.parcours.technologies}>
       {P.stack.map((tech) => (
         <li>{tech}</li>
       ))}
     </ul>
     <div class="links">
       <a class="link-accent case-link" href={P.href}>
-        Lire l’étude de cas<span class="visually-hidden"> : {P.title}</span>
+        {t.projects.readCase}
+        <span class="visually-hidden"> : {P.title}</span>
         <Icon name="arrow-right" size={16} />
       </a>
       <a class="link-quiet src-link" href={P.repo} target="_blank" rel="noopener">
-        Code source
-        <span class="visually-hidden"> du robot secouriste sur GitHub (nouvel onglet)</span>
+        {t.projects.sourceCode}
+        <span class="visually-hidden">{t.projects.featuredSourceHidden}</span>
         <Icon name="arrow-up-right" size={15} />
       </a>
     </div>
