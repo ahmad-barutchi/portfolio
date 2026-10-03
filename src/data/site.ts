@@ -117,6 +117,7 @@ export const EXPERIENCES: readonly Experience[] = [
     place: 'Namur, Belgique',
     period: 'Depuis mars 2026',
     description: 'Informatique industrielle et gestion de projets en télégestion.',
+    stack: ['Python', 'Java', 'Angular', 'Debian', 'PostgreSQL'],
     featured: true,
     badge: 'Poste actuel',
   },
