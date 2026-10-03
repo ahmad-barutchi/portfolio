@@ -4,17 +4,21 @@
  * compétences liées s'allument ; clic → épingle (aria-pressed), Échap → libère.
  */
 import Section from '../Section.astro';
-import { SECTIONS, SKILL_GROUPS, SKILLS_PROFILE } from '../../data/site';
+import { useI18n } from '../../i18n';
+
+const { c, t } = useI18n(Astro);
+const { SECTIONS, SKILL_GROUPS, SKILLS_PROFILE, splitEmphasis } = c;
+const title = splitEmphasis(SECTIONS.competences.title);
 
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <Section id="competences" index={SECTIONS.competences.index} label={SECTIONS.competences.label}>
   <Fragment slot="title">
-    Une boîte à outils <em class="serif">reliée</em>.
+    {title.map((part) => (part.em ? <em class="serif">{part.text}</em> : part.text))}
   </Fragment>
   <p slot="aside" class="mono hint">
-    Survolez ou touchez une compétence
+    {t.skills.hint}
   </p>
 
   <p class="lead intro">{SKILLS_PROFILE}</p>
@@ -206,9 +210,14 @@ const pad = (n: number) => String(n).padStart(2, '0');
       if (!status) return;
       const label = byId.get(id)!.textContent!.trim();
       const names = [...links.get(id)!].map((x) => byId.get(x)!.textContent!.trim());
+      const en = document.documentElement.lang === 'en';
       status.textContent = names.length
-        ? `${label} : lié à ${names.join(', ')}.`
-        : `${label} : aucune compétence liée.`;
+        ? en
+          ? `${label}: linked to ${names.join(', ')}.`
+          : `${label} : lié à ${names.join(', ')}.`
+        : en
+          ? `${label}: no linked skills.`
+          : `${label} : aucune compétence liée.`;
     };
 
     const pin = (id: string | null) => {

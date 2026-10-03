@@ -11,11 +11,9 @@ export const SITE = {
   title: 'Ahmad Barutchi — Informaticien industriel et développeur full-stack à Namur',
   description:
     'Informaticien industriel et chef de projets à l’INASEP, développeur full-stack (Python, Odoo, Angular) basé à Namur. Parcours, projets dont un robot secouriste IoT, et contact.',
-  locale: 'fr_BE',
-  lang: 'fr',
   repo: 'https://github.com/ahmad-barutchi/portfolio',
   ogImage: '/og.png',
-} as const;
+};
 
 export const PROFILE = {
   name: 'Ahmad Barutchi',
@@ -48,7 +46,7 @@ export const PROFILE = {
     { code: 'AR', name: 'Arabe' },
   ],
   drivingLicense: 'B, depuis 2014',
-} as const;
+};
 
 export type NavId = 'accueil' | 'a-propos' | 'parcours' | 'projets' | 'competences' | 'contact';
 
@@ -61,14 +59,21 @@ export const NAV: ReadonlyArray<{ id: NavId; label: string }> = [
   { id: 'contact', label: 'Contact' },
 ];
 
-/** Numérotation éditoriale des sections. */
+/**
+ * Numérotation éditoriale des sections et leurs titres
+ * (le mot entre astérisques passe en serif italique).
+ */
 export const SECTIONS = {
-  'a-propos': { index: '01', label: 'À propos' },
-  parcours: { index: '02', label: 'Parcours' },
-  projets: { index: '03', label: 'Projets' },
-  competences: { index: '04', label: 'Compétences' },
-  contact: { index: '05', label: 'Contact' },
-} as const;
+  'a-propos': {
+    index: '01',
+    label: 'À propos',
+    title: 'Trois langues, deux claviers, *une partition*.',
+  },
+  parcours: { index: '02', label: 'Parcours', title: 'Expériences qui *comptent*.' },
+  projets: { index: '03', label: 'Projets', title: 'Des choses que j’ai *construites*.' },
+  competences: { index: '04', label: 'Compétences', title: 'Une boîte à outils *reliée*.' },
+  contact: { index: '05', label: 'Contact', title: 'Travaillons *ensemble*.' },
+};
 
 export const HERO = {
   /** La partie en gras ; le mot entre astérisques passe en Instrument Serif italique. */
@@ -77,7 +82,7 @@ export const HERO = {
     'Développeur full-stack : Python, Odoo et Angular, du capteur jusqu’au tableau de bord.',
   primaryCta: { label: 'Voir les projets', href: '#projets' },
   secondaryCta: { label: 'CV · PDF' },
-} as const;
+};
 
 export const ABOUT = {
   /** HTML autorisé : <em> pour le mot en serif. */
@@ -93,7 +98,7 @@ export const ABOUT = {
     { label: 'Enseigne', value: 'Informatique et musique' },
   ],
   portraitAlt: 'Portrait d’Ahmad Barutchi, souriant, en chemise blanche',
-} as const;
+};
 
 export type Experience = {
   year: string;
@@ -236,7 +241,7 @@ export const FEATURED_PROJECT = {
     'Un prototype qui détecte une présence humaine ou une source de feu, et transmet sa télémétrie à un tableau de bord web et Android.',
   stack: ['Flask', 'Angular', 'Arduino', 'MongoDB', 'Capacitor'],
   repo: 'https://github.com/ahmad-barutchi/RescueRobot',
-} as const;
+};
 
 export type ProjectTile = {
   id: 'deepvision' | 'sdg' | 'portfolio';
@@ -284,19 +289,29 @@ export const PROJECT_TILES: readonly ProjectTile[] = [
 export const RADAR = {
   kicker: 'Base',
   caption: 'Là où j’ai travaillé, étudié et participé à des hackathons.',
-} as const;
+};
 
 /**
  * Tuile radar « Namur. » : lieux où Ahmad a travaillé, étudié ou participé à des hackathons.
  * x, y en px depuis Namur (≈ 0,85 px/km, nord en haut) ; delay = angle / 360 × 4 s.
  */
-export const RADAR_PLACES = [
+export type RadarPlace = {
+  code: string;
+  name: string;
+  x: number;
+  y: number;
+  delay: number;
+  labelBelow?: boolean;
+  labelLeft?: boolean;
+};
+
+export const RADAR_PLACES: readonly RadarPlace[] = [
   { code: 'MONS', name: 'Mons', x: -55, y: 1, delay: 2.99, labelLeft: true },
   { code: 'BXL', name: 'Bruxelles', x: -31, y: -36, delay: 3.55 },
   { code: 'CRL', name: 'Charleroi', x: -26, y: 5, delay: 2.87, labelBelow: true },
   { code: 'LGE', name: 'Liège', x: 42, y: -15, delay: 0.78 },
   { code: 'GND', name: 'Gand', x: -69, y: -55, delay: 3.43 },
-] as const;
+];
 
 export type Hackathon = {
   date: string;
@@ -330,7 +345,7 @@ export const HACKATHONS: readonly Hackathon[] = [
 
 export type Skill = { id: string; label: string; links?: readonly string[] };
 
-export const SKILLS_PROFILE =
+export const SKILLS_PROFILE: string =
   'Informaticien industriel et développeur full-stack : front-end, back-end, mobile (Android) et applications web.';
 
 /** Groupes de la carte de stack. `links` : compétences liées qui s'allument au survol (symétrisées à l'usage). */
@@ -393,16 +408,16 @@ export const SKILL_GROUPS: ReadonlyArray<{ id: string; label: string; items: rea
   },
 ];
 
-export const CONTACT = {
-  /** Le mot entre astérisques passe en serif italique. */
-  title: 'Travaillons *ensemble*.',
+export type ContactLink = { id: 'linkedin' | 'github' | 'apprentus'; label: string; href: string };
+
+export const CONTACT: { intro: string; links: readonly ContactLink[] } = {
   intro: 'Un projet, une collaboration ou une question : écrivez-moi.',
   links: [
     { id: 'linkedin', label: 'LinkedIn', href: PROFILE.linkedin },
     { id: 'github', label: 'GitHub', href: PROFILE.github },
     { id: 'apprentus', label: 'Apprentus', href: PROFILE.apprentus },
   ],
-} as const;
+};
 
 /** Transforme « mot *accent* fin » en segments pour rendre le mot en serif italique. */
 export function splitEmphasis(text: string): Array<{ text: string; em: boolean }> {

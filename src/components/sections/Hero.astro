@@ -7,13 +7,16 @@
 import Icon from '../Icon.astro';
 import SignalField from '../hero/SignalField.astro';
 import PacketRule from '../hero/PacketRule.astro';
-import { HERO, PROFILE, splitEmphasis } from '../../data/site';
+import { useI18n } from '../../i18n';
+
+const { c, t } = useI18n(Astro);
+const { HERO, PROFILE, splitEmphasis } = c;
 
 const status = PROFILE.availability ? PROFILE.availabilityLabel[PROFILE.availability] : null;
 const lede = splitEmphasis(HERO.ledeStrong);
 ---
 
-<section id="accueil" class="hero" aria-label="Présentation">
+<section id="accueil" class="hero" aria-label={t.hero.aria}>
   <SignalField />
 
   <div class="hero-inner">
@@ -32,19 +35,19 @@ const lede = splitEmphasis(HERO.ledeStrong);
       <dl class="telemetry fade fade-3">
         {status && (
           <>
-            <dt>Statut</dt>
+            <dt>{t.hero.status}</dt>
             <dd>
               <span class="beacon" aria-hidden="true" />
               {status}
             </dd>
           </>
         )}
-        <dt>Heure</dt>
+        <dt>{t.hero.time}</dt>
         <dd>
           <span data-clock>--:--</span> · {PROFILE.city}
         </dd>
         <dt>
-          <abbr title="Coordonnées">Coord.</abbr>
+          <abbr title={t.hero.coordsTitle}>{t.hero.coordsAbbr}</abbr>
         </dt>
         <dd>{PROFILE.coords}</dd>
       </dl>
@@ -69,7 +72,7 @@ const lede = splitEmphasis(HERO.ledeStrong);
           href={PROFILE.cv}
           target="_blank"
           rel="noopener"
-          aria-label="Télécharger le CV (PDF)"
+          aria-label={t.cvDownload}
         >
           <Icon name="download" />
           {HERO.secondaryCta.label}
@@ -79,8 +82,8 @@ const lede = splitEmphasis(HERO.ledeStrong);
   </div>
 
   <a class="scroll-cue" href="#a-propos">
-    <span class="mono">Défiler</span>
-    <span class="visually-hidden"> jusqu’à la section À propos</span>
+    <span class="mono">{t.hero.scroll}</span>
+    <span class="visually-hidden">{t.hero.scrollHidden}</span>
     <span class="cue-line" aria-hidden="true"></span>
   </a>
 </section>

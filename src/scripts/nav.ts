@@ -9,7 +9,8 @@
  * - barre masquée en défilant vers le bas, réaffichée vers le haut (jamais près
  *   du haut de page, pendant un saut d'ancre ou quand le menu est ouvert) ;
  * - menu mobile : <dialog> modal (top layer), aria-expanded synchronisé,
- *   fermeture au clic sur un lien puis navigation native vers l'ancre.
+ *   fermeture au clic sur un lien puis navigation native vers l'ancre ;
+ * - lien de langue : garde la section courante (#ancre), communes aux deux langues.
  */
 const header = document.querySelector<HTMLElement>('[data-nav]');
 if (header) initNav(header);
@@ -172,6 +173,13 @@ function initNav(header: HTMLElement): void {
     });
     matchMedia('(min-width: 821px)').addEventListener('change', (e) => {
       if (e.matches && menu.open) menu.close();
+    });
+  }
+
+  /* Changement de langue : on reste sur la même section. */
+  for (const a of header.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]')) {
+    a.addEventListener('click', () => {
+      if (home && location.hash) a.hash = location.hash;
     });
   }
 }

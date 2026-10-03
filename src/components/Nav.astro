@@ -2,26 +2,32 @@
 /**
  * Navigation « SIGNAL » : barre collante de hauteur nulle (la page passe
  * dessous), barre de progression pilotée par le scroll (0 JS), monogramme
- * « ab· », pilule de verre avec capsule active qui glisse, bascule de thème et
- * lien CV. Sous 820 px, la pilule ne garde que le thème et le bouton menu, qui
- * ouvre MobileMenu (<dialog> modal).
+ * « ab· », pilule de verre avec capsule active qui glisse, lien vers l'autre
+ * langue, bascule de thème et lien CV. Sous 820 px, la pilule ne garde que la
+ * langue, le thème et le bouton menu, qui ouvre MobileMenu (<dialog> modal).
  * Comportement : src/scripts/nav.ts (capsule, scroll-spy, masquage, menu) et
  * src/scripts/theme.ts (thème, contrat « themechange »).
  */
 import Icon from './Icon.astro';
 import MobileMenu from './shell/MobileMenu.astro';
-import { NAV, PROFILE, SECTIONS, type NavId } from '../data/site';
+import type { NavId } from '../data/site';
+import { useI18n } from '../i18n';
 
 interface Props {
   /** Accueil : liens d'ancre locaux (#id) et scroll-spy. */
   home?: boolean;
   /** Hors accueil : section mise en avant (aria-current="page"). */
   current?: NavId;
+  /** Même page dans l'autre langue (sinon, son accueil). */
+  switchHref?: string;
 }
 
-const { home = false, current } = Astro.props;
+const { other, c, t, section, home: homePath } = useI18n(Astro);
+const { NAV, PROFILE, SECTIONS } = c;
+const { home = false, current, switchHref } = Astro.props;
 const pageCurrent = home ? undefined : current;
-const href = (id: NavId) => (home ? `#${id}` : `/#${id}`);
+const href = (id: NavId) => section(id, home);
+const switchTo = switchHref ?? (other === 'en' ? '/en' : '/');
 /** Sections suivies par le scroll-spy, dans l'ordre de la page. */
 const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
 ---
@@ -37,13 +43,13 @@ const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
   <div class="navrow">
     <a
       class="brand"
-      href={home ? '#accueil' : '/'}
-      aria-label={home ? 'Ahmad Barutchi, haut de page' : 'Ahmad Barutchi, accueil'}
+      href={home ? '#accueil' : homePath}
+      aria-label={home ? t.brandTop : t.brandHome}
     >
       ab<span class="brand-dot" aria-hidden="true"></span>
     </a>
 
-    <nav class="pill" aria-label="Navigation principale">
+    <nav class="pill" aria-label={t.mainNav}>
       <div class="track" data-nav-track>
         <span class="cap" data-nav-cap aria-hidden="true"></span>
         <ul class="links" role="list">
@@ -62,22 +68,26 @@ const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
         </ul>
       </div>
       <span class="sep" aria-hidden="true"></span>
+      <a
+        class="lang-btn"
+        href={switchTo}
+        hreflang={t.switchLang}
+        lang={t.switchLang}
+        aria-label={t.switchAria}
+        data-lang-switch
+      >
+        {t.switchLabel}
+      </a>
       <button
         class="icon-btn theme-btn"
         type="button"
         data-theme-toggle
-        aria-label="Passer au thème clair"
+        aria-label={t.themeToLight}
       >
         <Icon name="moon" class="theme-ic theme-moon" />
         <Icon name="sun" class="theme-ic theme-sun" />
       </button>
-      <a
-        class="cv"
-        href={PROFILE.cv}
-        target="_blank"
-        rel="noopener"
-        aria-label="Télécharger le CV (PDF)"
-      >
+      <a class="cv" href={PROFILE.cv} target="_blank" rel="noopener" aria-label={t.cvDownload}>
         CV
         <Icon name="arrow-up-right" size={14} />
       </a>
@@ -87,14 +97,14 @@ const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
         data-menu-open
         aria-expanded="false"
         aria-controls="menu-mobile"
-        aria-label="Ouvrir le menu"
+        aria-label={t.menuOpen}
       >
         <Icon name="menu" size={20} />
       </button>
     </nav>
   </div>
 
-  <MobileMenu id="menu-mobile" home={home} current={current} />
+  <MobileMenu id="menu-mobile" home={home} current={current} switchHref={switchTo} />
 </header>
 
 <script>
@@ -294,6 +304,33 @@ const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
     color: var(--fg);
   }
 
+  /* Lien vers l'autre langue : code de langue en mono, même gabarit que les boutons. */
+  .lang-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--fg-2);
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .lang-btn:hover {
+    background: var(--bg-3);
+    color: var(--fg);
+  }
+
+  .lang-btn:focus-visible {
+    outline-offset: 2px;
+  }
+
   /* Lune en sombre, soleil en clair ; l'icône qui apparaît tourne en entrant. */
   .theme-btn :global(.theme-ic) {
     grid-area: 1 / 1;
@@ -363,7 +400,8 @@ const spy = home ? ['accueil', ...Object.keys(SECTIONS)].join(' ') : undefined;
       height: 54px;
     }
 
-    .icon-btn {
+    .icon-btn,
+    .lang-btn {
       width: 44px;
       height: 44px;
     }

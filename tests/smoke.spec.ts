@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-const PAGES = ['/', '/projets/robot-secouriste', '/404'];
+const PAGES = ['/', '/projets/robot-secouriste', '/en', '/en/projects/rescue-robot', '/404'];
 
 /** Charge une page en collectant erreurs console et requêtes vers un autre domaine. */
 async function load(page: Page, url: string) {
@@ -78,6 +78,26 @@ test('étude de cas : accessible depuis la tuile vedette', async ({ page }) => {
   await page.locator('a[href="/projets/robot-secouriste"]').first().click();
   await expect(page).toHaveURL(/\/projets\/robot-secouriste$/);
   await expect(page.locator('h1')).toContainText('robot');
+});
+
+test('langues : FR par défaut, EN sous /en, liens croisés et hreflang', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+    'href',
+    /\/en$/,
+  );
+  await page.locator('nav [data-lang-switch]').first().click();
+  await expect(page).toHaveURL(/\/en$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('#a-propos h2')).toContainText('Three languages');
+
+  await page.locator('a[href="/en/projects/rescue-robot"]').first().click();
+  await expect(page).toHaveURL(/\/en\/projects\/rescue-robot$/);
+  await expect(page.locator('h1')).toContainText('rescue');
+  await page.locator('nav [data-lang-switch]').first().click();
+  await expect(page).toHaveURL(/\/projets\/robot-secouriste$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
 });
 
 test('une URL inconnue renvoie la page 404', async ({ page }) => {

@@ -1,20 +1,22 @@
 ---
 /**
- * Pied de page (HANDOVER 6.9) : filet, mentions en mono discret, heure locale
+ * Pied de page : filet, mentions en mono discret, heure locale
  * (src/scripts/clock.ts, chargé ici pour toutes les pages), code source, retour
  * en haut, et un clin d'œil : une note de musique avec infobulle CSS, visible
  * au survol comme au focus, que la touche Échap fait disparaître.
  */
 import Icon from './Icon.astro';
-import { PROFILE, SITE } from '../data/site';
+import { useI18n } from '../i18n';
 
 interface Props {
   /** Accueil : « Haut de page » vise #accueil (sinon #contenu). Déduit de l'URL par défaut. */
   home?: boolean;
 }
 
-const path = Astro.url.pathname;
-const { home = path === '/' || path === '/index.html' } = Astro.props;
+const { c, t, home: homePath } = useI18n(Astro);
+const { PROFILE, SITE } = c;
+const path = Astro.url.pathname.replace(/(index)?\.html$/, '').replace(/(.)\/$/, '$1') || '/';
+const { home = path === homePath } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
@@ -28,24 +30,24 @@ const year = new Date().getFullYear();
         {' '}
         ·{' '}
       </span>
-      <span class="foot-made">Conçu et codé à {PROFILE.city}</span>
+      <span class="foot-made">{t.footer.made(PROFILE.city)}</span>
     </p>
 
     <p class="mono foot-clock">
       <span class="foot-dot" aria-hidden="true"></span>
-      Il est <span data-clock>--:--</span> à {PROFILE.city}
+      {t.footer.clockBefore} <span data-clock>--:--</span> {t.footer.clockAfter(PROFILE.city)}
     </p>
 
     <ul class="foot-links" role="list">
       <li>
         <a class="foot-link" href={SITE.repo} target="_blank" rel="noopener">
-          Code source
+          {t.footer.source}
           <Icon name="arrow-up-right" size={14} />
         </a>
       </li>
       <li>
         <a class="foot-link foot-top" href={home ? '#accueil' : '#contenu'}>
-          Haut de page
+          {t.footer.top}
           <Icon name="arrow-up" size={14} />
         </a>
       </li>
@@ -53,13 +55,13 @@ const year = new Date().getFullYear();
         <button
           class="note-btn"
           type="button"
-          aria-label="Note de musique"
+          aria-label={t.footer.note}
           aria-describedby="note-tip"
         >
           <Icon name="music" size={16} />
         </button>
         <span class="tip" id="note-tip" role="tooltip">
-          Je donne aussi des cours de musique
+          {t.footer.noteTip}
         </span>
       </li>
     </ul>

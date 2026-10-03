@@ -1,5 +1,7 @@
-// Budgets de poids (HANDOVER 8.1), mesurés en gzip sur dist/.
+// Budgets de poids, mesurés en gzip sur dist/.
 // JS : fichiers + scripts inline. CSS : fichiers + styles inline. Code de sortie 1 si dépassement.
+// Dans les totaux, un script ou un style inline identique sur plusieurs pages (ou dans
+// les deux langues) n'est compté qu'une fois : c'est le même code.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
@@ -26,6 +28,8 @@ const fontFiles = files.filter((f) => f.endsWith('.woff2'));
 
 let inlineJsAll = 0;
 let inlineCssAll = 0;
+const seenInline = new Set();
+const countOnce = (body, n) => (seenInline.has(body) ? 0 : (seenInline.add(body), n));
 const pages = html.map((file) => {
   const src = fs.readFileSync(file, 'utf8');
   const scripts = [...src.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
@@ -37,7 +41,7 @@ const pages = html.map((file) => {
     else if (body.trim()) {
       const n = gz(Buffer.from(body));
       js += n;
-      inlineJsAll += n;
+      inlineJsAll += countOnce(body, n);
     }
   }
   let css = 0;
@@ -47,7 +51,7 @@ const pages = html.map((file) => {
   for (const [, body] of src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)) {
     const n = gz(Buffer.from(body));
     css += n;
-    inlineCssAll += n;
+    inlineCssAll += countOnce(body, n);
   }
   const fonts = sum(
     [...src.matchAll(/<link[^>]+rel="preload"[^>]+href="([^"]+\.woff2)"/g)].map(

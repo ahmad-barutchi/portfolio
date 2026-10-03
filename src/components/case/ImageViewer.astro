@@ -8,6 +8,9 @@
  * Le focus revient sur la figure d'origine.
  */
 import Icon from '../Icon.astro';
+import { useI18n } from '../../i18n';
+
+const { t } = useI18n(Astro);
 ---
 
 <dialog class="viewer" aria-labelledby="viewer-legende" data-viewer>
@@ -16,7 +19,7 @@ import Icon from '../Icon.astro';
     <span class="mono viewer-num" data-viewer-num></span>
     <span data-viewer-text></span>
   </p>
-  <button type="button" class="viewer-close" aria-label="Fermer l’image" autofocus>
+  <button type="button" class="viewer-close" aria-label={t.caseStudy.closeImage} autofocus>
     <Icon name="close" size={20} />
   </button>
 </dialog>

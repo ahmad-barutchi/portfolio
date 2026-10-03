@@ -1,7 +1,7 @@
 /**
- * Étude de cas « Robot secouriste » (TFE 2022) — contenu structuré.
- * Copy corrigée de HANDOVER.md section 7.6 ; figures et textes alternatifs du
- * tableau 7.6 (fichiers rapatriés par `npm run fetch:images`, voir annexe A).
+ * Étude de cas « Robot secouriste » (TFE 2022) — contenu structuré, en français.
+ * Version anglaise : case-robot.en.ts (même forme). Figures et textes alternatifs
+ * pour les captures de src/assets/projects/robot-secouriste/.
  *
  * Mini-balisage dans les paragraphes : `code` entre accents graves.
  * Les espaces insécables de la typographie française (avant : ; ! ? », après «)
@@ -85,7 +85,7 @@ export const CASE_ROBOT = {
     { name: 'MongoDB', role: 'Base de données' },
     { name: 'Capacitor', role: 'Application Android' },
   ] satisfies readonly CaseStackItem[],
-} as const;
+};
 
 export const CASE_FACTS: readonly CaseFact[] = [
   { label: 'Équipe', value: `${CASE_ROBOT.members[0]} et ${CASE_ROBOT.members[1]}` },
@@ -95,7 +95,7 @@ export const CASE_FACTS: readonly CaseFact[] = [
 ];
 
 /* --------------------------------------------------------------------------
-   Corps (HANDOVER 7.6, copy corrigée)
+   Corps
    -------------------------------------------------------------------------- */
 
 const SECTIONS: readonly CaseSection[] = [
@@ -283,6 +283,9 @@ const NBSP = ' ';
 export function frenchSpacing(text: string): string {
   return text.replace(/ ([:;!?»])/g, `${NBSP}$1`).replace(/« /g, `«${NBSP}`);
 }
+
+/** Mise en forme typographique propre à la langue (ici, les espaces insécables). */
+export const typeset = frenchSpacing;
 
 export const CASE_SECTIONS: readonly CaseSection[] = SECTIONS.map((s) => ({
   ...s,

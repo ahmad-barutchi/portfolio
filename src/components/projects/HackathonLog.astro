@@ -5,24 +5,36 @@
  */
 import Tile from './Tile.astro';
 import Icon from '../Icon.astro';
-import { HACKATHONS } from '../../data/site';
+import { useI18n } from '../../i18n';
 
+const { c, t } = useI18n(Astro);
+const { HACKATHONS } = c;
+
+/** Abréviations de mois, en français et en anglais. */
 const MONTHS: Record<string, string> = {
   jan: '01',
   fév: '02',
+  feb: '02',
   mar: '03',
   avr: '04',
+  apr: '04',
   mai: '05',
+  may: '05',
   juin: '06',
+  jun: '06',
   juil: '07',
+  jul: '07',
   août: '08',
+  aug: '08',
   sept: '09',
+  sep: '09',
   oct: '10',
   nov: '11',
   déc: '12',
+  dec: '12',
 };
 
-/** « Fév 2023 » → « 2023-02 » (attribut datetime), undefined si le format est inconnu. */
+/** « Fév 2023 » / « Feb 2023 » → « 2023-02 » (attribut datetime), undefined si le format est inconnu. */
 function isoMonth(date: string): string | undefined {
   const [month = '', year = ''] = date.toLowerCase().split(/\s+/);
   const mm = MONTHS[month.replace(/\.$/, '')];
@@ -35,11 +47,9 @@ const count = HACKATHONS.length;
 <Tile variant="log" aria-labelledby="journal-hackathons-titre">
   <div class="head">
     <h3 id="journal-hackathons-titre" class="mono">
-      Journal des hackathons
+      {t.projects.logTitle}
     </h3>
-    <p class="mono count">
-      {count} {count > 1 ? 'participations' : 'participation'}
-    </p>
+    <p class="mono count">{t.projects.participations(count)}</p>
   </div>
 
   <ol class="log">
@@ -60,7 +70,7 @@ const count = HACKATHONS.length;
             href={h.link.href}
             target="_blank"
             rel="noopener"
-            aria-label={`${h.link.label} (nouvel onglet)`}
+            aria-label={`${h.link.label}${t.projects.newTab}`}
           >
             <Icon name="arrow-up-right" size={15} />
           </a>
