@@ -22,7 +22,7 @@
 | Stack | **Astro** (sortie 100 % statique) + **TypeScript** + **CSS vanilla moderne** (custom properties, `oklch`, container queries, scroll-driven animations, view transitions). Aucun framework UI, aucune lib d'animation. |
 | JS livré | ≤ 15 KB gzip pour tout le site, ≤ 5 KB sur la page d'accueil. Un seul morceau « riche » : le canvas du hero (~2,5 KB). |
 | Requêtes tierces | **Zéro** (polices auto-hébergées, images rapatriées dans le repo, pas de Google Forms, pas d'analytics). |
-| Hébergement | Firebase Hosting (plan gratuit, projet `ahmad-barutchi`, site `abarutchi`), déploiement par GitHub Actions sur `master`. |
+| Hébergement | Firebase Hosting (plan gratuit, projet `abarutchi`, site par défaut `abarutchi.web.app`), déploiement par GitHub Actions sur `master`. |
 | Pages | `/` (one-page à sections), `/projets/robot-secouriste` (étude de cas), `/404`. FR d'abord, EN en phase 2. |
 | Cible Lighthouse mobile | ≥ 95 dans les 4 catégories, objectif 100. |
 | Branche de travail | `claude/portfolio-redesign-modern-5rzbqf` |
@@ -675,13 +675,13 @@ Liens pour la carte de stack (`links`) : Odoo → Python, JavaScript, PostgreSQL
 - `hosting.public: "dist"`, `cleanUrls: true`, `trailingSlash: false` (avec `build.format: 'file'` côté Astro, `/projets/robot-secouriste.html` est servi sur `/projets/robot-secouriste`).
 - **Pas** de rewrite SPA vers `index.html` (site multi-pages ; Firebase sert `404.html`).
 - Headers : `/_astro/**` → `Cache-Control: public, max-age=31536000, immutable` ; `**/*.@(avif|webp|png|jpg|svg|woff2)` → idem ; `**/*.html` → `max-age=0, must-revalidate`. Ajouter `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal.
-- `.firebaserc` : conserver `"default": "ahmad-barutchi"`. Le site s'appelle `abarutchi` (`abarutchi.web.app`) : vérifier avec `firebase hosting:sites:list` et, si ce n'est pas le site par défaut du projet, déclarer `"site": "abarutchi"` dans `hosting`.
+- `.firebaserc` : `"default": "abarutchi"`. **Correction** : l'ancien `.firebaserc` disait `ahmad-barutchi`, mais la configuration Firebase de l'ancien site (`portfolio/public/firebase.js`) indique `projectId: "abarutchi"`, et `abarutchi.web.app` est le site par défaut de ce projet.
 - Test local : `npm run build && npx firebase-tools emulators:start --only hosting`.
 
 ### 9.3 GitHub Actions (`deploy.yml`)
 
 - Déclencheurs : `push` sur `master` → déploiement `live` ; `pull_request` → preview channel (expire 7 jours).
-- Étapes : checkout, `actions/setup-node` (LTS, cache npm), `npm ci`, `npm run check`, `npm run build`, `node scripts/budget.mjs`, `FirebaseExtended/action-hosting-deploy@v0` avec `repoToken: ${{ secrets.GITHUB_TOKEN }}`, `firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AHMAD_BARUTCHI }}`, `projectId: ahmad-barutchi`, `channelId: live` (ou vide pour la preview).
+- Étapes : checkout, `actions/setup-node` (LTS, cache npm), `npm ci`, `npm run check`, `npm run build`, `node scripts/budget.mjs`, `FirebaseExtended/action-hosting-deploy@v0` avec `repoToken: ${{ secrets.GITHUB_TOKEN }}`, `firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ABARUTCHI }}`, `projectId: abarutchi`, `channelId: live` (ou vide pour la preview).
 - **Action Ahmad** : créer le secret via `firebase init hosting:github` (génère le compte de service et le secret dans le repo). En attendant, `npx firebase-tools deploy --only hosting` en local fonctionne.
 
 ### 9.4 Scripts npm
