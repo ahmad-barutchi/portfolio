@@ -12,10 +12,10 @@ type Transition = { ready: Promise<void>; finished: Promise<void> };
 
 const root = document.documentElement;
 const COLOR: Record<Theme, string> = { dark: '#0b0d14', light: '#f7f4ee' };
-const LABEL: Record<Theme, string> = {
-  dark: 'Passer au thème clair',
-  light: 'Passer au thème sombre',
-};
+const LABEL: Record<Theme, string> =
+  root.lang === 'en'
+    ? { dark: 'Switch to light theme', light: 'Switch to dark theme' }
+    : { dark: 'Passer au thème clair', light: 'Passer au thème sombre' };
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const systemLight = matchMedia('(prefers-color-scheme: light)');
 
