@@ -6,6 +6,8 @@
  * lien reçoit aria-current, et le chapitre parent s'éclaire via :has().
  * Les cibles observées sont les éléments [data-toc-target="<id>"] de la page.
  */
+import { useI18n } from '../../i18n';
+
 export type TocItem = {
   id: string;
   label: string;
@@ -17,12 +19,13 @@ interface Props {
   items: readonly TocItem[];
 }
 
+const { t } = useI18n(Astro);
 const { items } = Astro.props;
 ---
 
 <nav class="toc" aria-labelledby="sommaire-titre" data-toc>
   <p class="mono toc-title" id="sommaire-titre">
-    Sommaire
+    {t.caseStudy.toc}
   </p>
   <ol class="toc-list">
     {items.map((item) => (
