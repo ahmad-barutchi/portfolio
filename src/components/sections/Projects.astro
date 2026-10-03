@@ -12,7 +12,11 @@ import HackathonTile from '../projects/HackathonTile.astro';
 import RadarTile from '../projects/RadarTile.astro';
 import HackathonLog from '../projects/HackathonLog.astro';
 import PortfolioTile from '../projects/PortfolioTile.astro';
-import { PROFILE, PROJECT_TILES, SECTIONS, type ProjectTile } from '../../data/site';
+import type { ProjectTile } from '../../data/site';
+import { useI18n } from '../../i18n';
+
+const { c, t } = useI18n(Astro);
+const { PROFILE, PROJECT_TILES, SECTIONS, splitEmphasis } = c;
 
 function tile(id: ProjectTile['id']): ProjectTile {
   const found = PROJECT_TILES.find((t) => t.id === id);
@@ -21,14 +25,16 @@ function tile(id: ProjectTile['id']): ProjectTile {
 }
 
 const { index, label } = SECTIONS.projets;
+const title = splitEmphasis(SECTIONS.projets.title);
 ---
 
 <Section id="projets" index={index} label={label}>
   <Fragment slot="title">
-    Des choses que j’ai <em class="serif">construites</em>.
+    {title.map((part) => (part.em ? <em class="serif">{part.text}</em> : part.text))}
   </Fragment>
   <a slot="aside" class="link-arrow" href={PROFILE.github} target="_blank" rel="noopener">
-    Tout sur GitHub<span class="visually-hidden"> (nouvel onglet)</span>
+    {t.projects.allOnGithub}
+    <span class="visually-hidden">{t.projects.newTab}</span>
     <Icon name="arrow-up-right" size={16} />
   </a>
 

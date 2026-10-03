@@ -5,10 +5,12 @@
  */
 import Section from '../Section.astro';
 import Icon from '../Icon.astro';
-import { EDUCATION, EXPERIENCES, SECTIONS } from '../../data/site';
+import { useI18n } from '../../i18n';
 
-const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
-const summary = `${plural(EXPERIENCES.length, 'expérience', 'expériences')} · ${plural(EDUCATION.length, 'formation', 'formations')}`;
+const { c, t } = useI18n(Astro);
+const { EDUCATION, EXPERIENCES, SECTIONS, splitEmphasis } = c;
+const title = splitEmphasis(SECTIONS.parcours.title);
+const summary = t.parcours.summary(EXPERIENCES.length, EDUCATION.length);
 const years = EDUCATION.map((e) => e.period.match(/\d{4}/g) ?? [])
   .flat()
   .map(Number);
@@ -17,7 +19,7 @@ const eduRange = `${Math.min(...years)} – ${Math.max(...years)}`;
 
 <Section id="parcours" index={SECTIONS.parcours.index} label={SECTIONS.parcours.label}>
   <Fragment slot="title">
-    Expériences qui <em class="serif">comptent</em>.
+    {title.map((part) => (part.em ? <em class="serif">{part.text}</em> : part.text))}
   </Fragment>
   <p slot="aside" class="mono aside">
     {summary}
@@ -46,7 +48,7 @@ const eduRange = `${Math.min(...years)} – ${Math.max(...years)}`;
             </header>
             <p class="tl-desc">{xp.description}</p>
             {xp.stack && (
-              <ul class="chips" aria-label="Technologies">
+              <ul class="chips" aria-label={t.parcours.technologies}>
                 {xp.stack.map((tech) => (
                   <li>{tech}</li>
                 ))}
@@ -68,7 +70,7 @@ const eduRange = `${Math.min(...years)} – ${Math.max(...years)}`;
 
   <div class="edu-block">
     <div class="edu-head">
-      <h3 class="h3-xl">Formations</h3>
+      <h3 class="h3-xl">{t.parcours.education}</h3>
       <p class="mono">{eduRange}</p>
     </div>
     <ul class="edu">

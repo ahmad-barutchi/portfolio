@@ -6,14 +6,18 @@
 import { Picture } from 'astro:assets';
 import Section from '../Section.astro';
 import portrait from '../../assets/portrait.jpg';
-import { ABOUT, PROFILE, SECTIONS } from '../../data/site';
+import { useI18n } from '../../i18n';
+
+const { c } = useI18n(Astro);
+const { ABOUT, PROFILE, SECTIONS, splitEmphasis } = c;
+const title = splitEmphasis(SECTIONS['a-propos'].title);
 
 const latitude = PROFILE.coords.split(' · ')[0];
 ---
 
 <Section id="a-propos" index={SECTIONS['a-propos'].index} label={SECTIONS['a-propos'].label}>
   <Fragment slot="title">
-    Du capteur à l’écran, <em class="serif">une ligne</em> à la fois.
+    {title.map((part) => (part.em ? <em class="serif">{part.text}</em> : part.text))}
   </Fragment>
 
   <div class="about-grid">

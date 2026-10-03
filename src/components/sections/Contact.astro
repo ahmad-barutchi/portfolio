@@ -5,9 +5,11 @@
  */
 import Section from '../Section.astro';
 import Icon from '../Icon.astro';
-import { CONTACT, PROFILE, SECTIONS, splitEmphasis } from '../../data/site';
+import { useI18n } from '../../i18n';
 
-const title = splitEmphasis(CONTACT.title);
+const { c, t } = useI18n(Astro);
+const { CONTACT, PROFILE, SECTIONS, splitEmphasis } = c;
+const title = splitEmphasis(SECTIONS.contact.title);
 const [mailUser, mailDomain] = PROFILE.email.split('@');
 const status = PROFILE.availability ? PROFILE.availabilityLabel[PROFILE.availability] : null;
 const icons = { linkedin: 'linkedin', github: 'github', apprentus: 'music' } as const;
@@ -43,13 +45,13 @@ const icons = { linkedin: 'linkedin', github: 'github', apprentus: 'music' } as 
             {mailDomain}
           </span>
           <span class="email-hint mono" aria-hidden="true">
-            <Icon name="copy" size={14} /> Copier
+            <Icon name="copy" size={14} /> {t.contact.copy}
           </span>
-          <span class="visually-hidden">: copier l’adresse dans le presse-papiers</span>
+          <span class="visually-hidden">{t.contact.copyHidden}</span>
         </button>
         <a class="link-quiet mailto" href={`mailto:${PROFILE.email}`}>
           <Icon name="mail" size={16} />
-          ou ouvrir votre messagerie
+          {t.contact.openMail}
         </a>
       </div>
     </div>
@@ -75,7 +77,7 @@ const icons = { linkedin: 'linkedin', github: 'github', apprentus: 'music' } as 
 
   <div class="toast" popover="manual" aria-hidden="true" data-copy-toast>
     <Icon name="check" size={16} />
-    Adresse copiée
+    {t.contact.copied}
   </div>
   <p class="visually-hidden" role="status" data-copy-status></p>
 </div>
@@ -340,7 +342,12 @@ const icons = { linkedin: 'linkedin', github: 'github', apprentus: 'music' } as 
       window.location.href = `mailto:${button.dataset.copy}`;
       return;
     }
-    if (status) status.textContent = 'Adresse e-mail copiée dans le presse-papiers.';
+    if (status) {
+      status.textContent =
+        document.documentElement.lang === 'en'
+          ? 'Email address copied to the clipboard.'
+          : 'Adresse e-mail copiée dans le presse-papiers.';
+    }
     if (toast && 'showPopover' in toast) {
       clearTimeout(timer);
       if (!toast.matches(':popover-open')) toast.showPopover();
