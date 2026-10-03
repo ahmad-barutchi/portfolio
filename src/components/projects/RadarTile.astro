@@ -32,12 +32,8 @@ const places = RADAR_PLACES.map((p) => ({
       <ul class="chips" aria-label="Langues">
         {PROFILE.languages.map((l) => (
           <li>
-            <span aria-hidden="true">
-              {l.code} · {l.level}
-            </span>
-            <span class="visually-hidden">
-              {l.name}, niveau {l.level}
-            </span>
+            <span aria-hidden="true">{l.code}</span>
+            <span class="visually-hidden">{l.name}</span>
           </li>
         ))}
       </ul>
