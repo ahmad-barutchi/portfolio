@@ -81,7 +81,7 @@ export const HERO = {
 
 export const ABOUT = {
   /** HTML autorisé : <em> pour le mot en serif. */
-  lead: 'Depuis mars 2026, je suis informaticien <em>industriel</em> et chef de projets à l’INASEP, à Namur. Avant cela, j’ai passé un an chez BHC à construire des modules Odoo en Python et JavaScript, après deux stages web et un bachelier en Informatique et Systèmes à la HEH, à Mons.',
+  lead: 'Depuis mars 2026, je suis informaticien <em>industriel</em> et chef de projets en télégestion à l’INASEP, à Namur. Avant cela, j’ai passé un an chez BHC à construire des modules Odoo en Python et JavaScript, après deux stages web et un bachelier en Informatique et Systèmes à la HEH, à Mons.',
   paragraphs: [
     'Mon parcours a commencé ailleurs : des études d’ingénierie des équipements médicaux à Alep, deux ans de bénévolat au Croissant-Rouge, puis l’arrivée en Belgique. J’y ai appris le français de A1 à B2 en un an, et fait un détour par une école d’art à Gand avant de choisir le code.',
     'Mon travail de fin d’études était un robot secouriste qui remonte sa télémétrie vers un tableau de bord web et mobile. Depuis 2016, je donne aussi des cours particuliers d’informatique et de musique.',
@@ -116,7 +116,7 @@ export const EXPERIENCES: readonly Experience[] = [
     org: 'INASEP',
     place: 'Namur, Belgique',
     period: 'Depuis mars 2026',
-    description: 'Informatique industrielle et gestion de projets.',
+    description: 'Informatique industrielle et gestion de projets en télégestion.',
     featured: true,
     badge: 'Poste actuel',
   },
