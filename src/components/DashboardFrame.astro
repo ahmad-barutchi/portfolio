@@ -7,6 +7,7 @@
  */
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import { useI18n } from '../i18n';
 
 interface Props {
   image?: ImageMetadata;
@@ -20,9 +21,12 @@ interface Props {
   transitionName?: string;
 }
 
+const { t } = useI18n(Astro);
+const legend = t.dashboard.legend;
+
 const {
   image,
-  alt = 'Graphe du tableau de bord : températures et humidité relevées par le robot, et courbes de prédiction',
+  alt = t.dashboard.alt,
   class: className,
   widths = [480, 720, 960, 1280],
   sizes = '(min-width: 1100px) 640px, 100vw',
@@ -39,7 +43,7 @@ const {
     <i></i>
     <i></i>
     <i></i>
-    <span class="mono">Tableau de bord · Visualisation</span>
+    <span class="mono">{t.dashboard.bar}</span>
   </div>
   {image ? (
     <Image
@@ -63,23 +67,23 @@ const {
         <div class="dash-legend">
           <span>
             <i class="k-pres" />
-            Présence
+            {legend[0]}
           </span>
           <span>
             <i class="k-av" />
-            T° avant
+            {legend[1]}
           </span>
           <span>
             <i class="k-ar" />
-            T° arrière
+            {legend[2]}
           </span>
           <span>
             <i class="k-amb" />
-            T° ambiante
+            {legend[3]}
           </span>
           <span>
             <i class="k-hum" />
-            Humidité
+            {legend[4]}
           </span>
         </div>
         <svg class="dash-chart" viewBox="0 0 600 220" focusable="false">
