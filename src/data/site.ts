@@ -8,9 +8,9 @@
 export const SITE = {
   url: 'https://abarutchi.web.app',
   name: 'Ahmad Barutchi',
-  title: 'Ahmad Barutchi — Développeur full-stack à Mons',
+  title: 'Ahmad Barutchi — Informaticien industriel et développeur full-stack à Namur',
   description:
-    'Développeur full-stack basé à Mons (Python, Odoo, Angular). Parcours, projets dont un robot secouriste IoT, et contact.',
+    'Informaticien industriel et chef de projets à l’INASEP, développeur full-stack (Python, Odoo, Angular) basé à Namur. Parcours, projets dont un robot secouriste IoT, et contact.',
   locale: 'fr_BE',
   lang: 'fr',
   repo: 'https://github.com/ahmad-barutchi/portfolio',
@@ -21,18 +21,18 @@ export const PROFILE = {
   name: 'Ahmad Barutchi',
   firstName: 'Ahmad',
   lastName: 'Barutchi',
-  role: 'Développeur full-stack',
+  role: 'Informaticien industriel · chef de projets',
   /** 'open' affiche « Ouvert aux opportunités » ; null masque la ligne de statut. */
-  availability: 'open' as 'open' | 'busy' | null,
+  availability: 'busy' as 'open' | 'busy' | null,
   availabilityLabel: {
     open: 'Ouvert aux opportunités',
-    busy: 'En poste',
+    busy: 'En poste à l’INASEP',
   },
-  city: 'Mons',
+  city: 'Namur',
   country: 'Belgique',
   countryCode: 'BE',
-  postalCode: '7000',
-  coords: '50.45° N · 3.95° E',
+  postalCode: '5000',
+  coords: '50.47° N · 4.87° E',
   timeZone: 'Europe/Brussels',
   email: 'ahmad.barutchi@gmail.com',
   phone: '0472 81 38 31',
@@ -72,15 +72,16 @@ export const SECTIONS = {
 
 export const HERO = {
   /** La partie en gras ; le mot entre astérisques passe en Instrument Serif italique. */
-  ledeStrong: 'Développeur *full-stack* basé à Mons.',
-  ledeRest: 'Python, Odoo et Angular, du capteur jusqu’au tableau de bord.',
+  ledeStrong: 'Informaticien *industriel* et chef de projets à Namur.',
+  ledeRest:
+    'Développeur full-stack : Python, Odoo et Angular, du capteur jusqu’au tableau de bord.',
   primaryCta: { label: 'Voir les projets', href: '#projets' },
   secondaryCta: { label: 'CV · PDF' },
 } as const;
 
 export const ABOUT = {
   /** HTML autorisé : <em> pour le mot en serif. */
-  lead: 'Je suis développeur <em>full-stack</em>, basé à Mons. J’ai passé un an chez BHC à construire des modules Odoo en Python et JavaScript, après deux stages web et un bachelier en Informatique et Systèmes à la HEH.',
+  lead: 'Depuis mars 2026, je suis informaticien <em>industriel</em> et chef de projets à l’INASEP, à Namur. Avant cela, j’ai passé un an chez BHC à construire des modules Odoo en Python et JavaScript, après deux stages web et un bachelier en Informatique et Systèmes à la HEH, à Mons.',
   paragraphs: [
     'Mon parcours a commencé ailleurs : des études d’ingénierie des équipements médicaux à Alep, deux ans de bénévolat au Croissant-Rouge, puis l’arrivée en Belgique. J’y ai appris le français de A1 à B2 en un an, et fait un détour par une école d’art à Gand avant de choisir le code.',
     'Mon travail de fin d’études était un robot secouriste qui remonte sa télémétrie vers un tableau de bord web et mobile. Depuis 2016, je donne aussi des cours particuliers d’informatique et de musique.',
@@ -88,7 +89,7 @@ export const ABOUT = {
   facts: [
     { label: 'Langues', value: 'FR C2 · EN C1 · AR C2' },
     { label: 'Permis', value: 'B, depuis 2014' },
-    { label: 'Base', value: 'Mons, Belgique' },
+    { label: 'Base', value: 'Namur, Belgique' },
     { label: 'Enseigne', value: 'Informatique et musique' },
   ],
   portraitAlt: 'Portrait d’Ahmad Barutchi, souriant, en chemise blanche',
@@ -110,6 +111,16 @@ export type Experience = {
 
 export const EXPERIENCES: readonly Experience[] = [
   {
+    year: '2026',
+    role: 'Informaticien industriel, chef de projets',
+    org: 'INASEP',
+    place: 'Namur, Belgique',
+    period: 'Depuis mars 2026',
+    description: 'Informatique industrielle et gestion de projets.',
+    featured: true,
+    badge: 'Poste actuel',
+  },
+  {
     year: '2023',
     role: 'Software Engineer',
     org: 'BHC sprl',
@@ -117,8 +128,6 @@ export const EXPERIENCES: readonly Experience[] = [
     period: 'Sept 2023 – Oct 2024',
     description: 'Développement Odoo en Python et JavaScript.',
     stack: ['Odoo', 'Python', 'JavaScript', 'PostgreSQL'],
-    featured: true,
-    badge: 'Dernier poste',
   },
   {
     year: '2022',
@@ -277,15 +286,15 @@ export const RADAR = {
 } as const;
 
 /**
- * Tuile radar « Mons. » : lieux où Ahmad a travaillé, étudié ou participé à des hackathons.
- * x, y en px depuis Mons (≈ 0,75 px/km, nord en haut) ; delay = angle / 360 × 4 s.
+ * Tuile radar « Namur. » : lieux où Ahmad a travaillé, étudié ou participé à des hackathons.
+ * x, y en px depuis Namur (≈ 0,85 px/km, nord en haut) ; delay = angle / 360 × 4 s.
  */
 export const RADAR_PLACES = [
-  { code: 'BXL', name: 'Bruxelles', x: 21, y: -33, delay: 0.36 },
-  { code: 'CRL', name: 'Charleroi', x: 26, y: 3, delay: 1.07, labelBelow: true },
-  { code: 'NAM', name: 'Namur', x: 49, y: -2, delay: 0.97 },
-  { code: 'LGE', name: 'Liège', x: 86, y: -15, delay: 0.89 },
-  { code: 'GND', name: 'Gand', x: -12, y: -50, delay: 3.85 },
+  { code: 'MONS', name: 'Mons', x: -55, y: 1, delay: 2.99, labelLeft: true },
+  { code: 'BXL', name: 'Bruxelles', x: -31, y: -36, delay: 3.55 },
+  { code: 'CRL', name: 'Charleroi', x: -26, y: 5, delay: 2.87, labelBelow: true },
+  { code: 'LGE', name: 'Liège', x: 42, y: -15, delay: 0.78 },
+  { code: 'GND', name: 'Gand', x: -69, y: -55, delay: 3.43 },
 ] as const;
 
 export type Hackathon = {
@@ -321,7 +330,7 @@ export const HACKATHONS: readonly Hackathon[] = [
 export type Skill = { id: string; label: string; links?: readonly string[] };
 
 export const SKILLS_PROFILE =
-  'Développeur full-stack (front-end, back-end), développement mobile (Android), applications web.';
+  'Informaticien industriel et développeur full-stack : front-end, back-end, mobile (Android) et applications web.';
 
 /** Groupes de la carte de stack. `links` : compétences liées qui s'allument au survol (symétrisées à l'usage). */
 export const SKILL_GROUPS: ReadonlyArray<{ id: string; label: string; items: readonly Skill[] }> = [
@@ -386,7 +395,7 @@ export const SKILL_GROUPS: ReadonlyArray<{ id: string; label: string; items: rea
 export const CONTACT = {
   /** Le mot entre astérisques passe en serif italique. */
   title: 'Travaillons *ensemble*.',
-  intro: 'Un poste, une mission ou une question sur un projet : écrivez-moi.',
+  intro: 'Un projet, une collaboration ou une question : écrivez-moi.',
   links: [
     { id: 'linkedin', label: 'LinkedIn', href: PROFILE.linkedin },
     { id: 'github', label: 'GitHub', href: PROFILE.github },

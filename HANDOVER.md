@@ -6,6 +6,7 @@
 > la spécification composant par composant, **tout le contenu du site actuel** (corrigé), les budgets de
 > performance, la structure cible du repo, le déploiement Firebase et un plan de travail par phases.
 > L'application Angular existante doit être **supprimée** : tout ce qu'il faut en garder est ici.
+> **Mise à jour du contenu (2026-10-03)** : Ahmad vit désormais à **Namur** et travaille depuis **mars 2026** comme **informaticien industriel, chef de projets à l'INASEP** (Namur). Le site en tient compte (`src/data/site.ts` fait foi) ; les mentions de Mons comme base dans ce document et dans la maquette sont dépassées.
 > **Statut (2026-10-03)** : le site décrit ici est construit sur la branche `claude/portfolio-redesign-modern-5rzbqf` (voir README.md). Reste à fournir : les captures du TFE (`npm run fetch:images`) et le secret de déploiement Firebase.
 > **Maquette de référence** (hero + bento, sombre / clair / mobile, interactive) : https://claude.ai/artifact/Vvs6kQE2NkrDLKixhWypNH
 > Elle est privée : Ahmad doit la partager (menu Share) pour qu'un autre compte puisse l'ouvrir.

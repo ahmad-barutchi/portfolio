@@ -1,6 +1,6 @@
 # Portfolio — Ahmad Barutchi
 
-Site personnel d'Ahmad Barutchi, développeur full-stack à Mons : [abarutchi.web.app](https://abarutchi.web.app).
+Site personnel d'Ahmad Barutchi, informaticien industriel et développeur full-stack à Namur : [abarutchi.web.app](https://abarutchi.web.app).
 
 Design « SIGNAL » : encre bleu-nuit, un seul accent ambre, un champ de points vivant dans le hero, typographie éditoriale. Thèmes sombre et clair, responsive, accessible, et très léger.
 
@@ -35,7 +35,7 @@ npm run dev       # http://localhost:4321
 
 Tout le texte du site est dans **`src/data/site.ts`** : profil, statut de disponibilité, expériences, formations, projets, hackathons, compétences, contact. Le contenu de l'étude de cas est dans `src/data/case-robot.ts`.
 
-- Masquer la ligne « Ouvert aux opportunités » : `PROFILE.availability = null`.
+- Ligne de statut du hero et du contact : `PROFILE.availability` vaut `'busy'` (« En poste à l’INASEP »), `'open'` (« Ouvert aux opportunités ») ou `null` (masquée).
 - Héberger le CV : déposer `public/cv-ahmad-barutchi.pdf` puis mettre `PROFILE.cv = '/cv-ahmad-barutchi.pdf'`.
 
 ## Captures de l'étude de cas

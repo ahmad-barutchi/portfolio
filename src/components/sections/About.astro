@@ -13,7 +13,7 @@ const latitude = PROFILE.coords.split(' · ')[0];
 
 <Section id="a-propos" index={SECTIONS['a-propos'].index} label={SECTIONS['a-propos'].label}>
   <Fragment slot="title">
-    D’Alep à Mons, <em class="serif">une ligne</em> à la fois.
+    D’Alep à Namur, <em class="serif">une ligne</em> à la fois.
   </Fragment>
 
   <div class="about-grid">
@@ -163,6 +163,7 @@ const latitude = PROFILE.coords.split(' · ')[0];
 
   figcaption {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px;
     margin-top: 14px;

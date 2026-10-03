@@ -1,6 +1,6 @@
 ---
 /**
- * Tuile radar « Mons. » (2×1) : la base, les langues, et un radar CSS dont le
+ * Tuile radar « Namur. » (2×1) : la base, les langues, et un radar CSS dont le
  * balayage (4 s) allume tour à tour les lieux où Ahmad a travaillé, étudié ou
  * participé à des hackathons (chaque point a un animation-delay = angle / 360 × 4 s).
  * Le radar est décoratif ; une liste masquée nomme les villes pour les lecteurs d'écran.
@@ -12,6 +12,7 @@ const places = RADAR_PLACES.map((p) => ({
   ...p,
   style: `--x: ${p.x}; --y: ${p.y}; --d: ${p.delay}s`,
   below: 'labelBelow' in p && p.labelBelow,
+  left: 'labelLeft' in p && p.labelLeft,
 }));
 ---
 
@@ -48,7 +49,7 @@ const places = RADAR_PLACES.map((p) => ({
         <span class="lbl">{PROFILE.city}</span>
       </span>
       {places.map((p) => (
-        <span class:list={['blip', { below: p.below }]} style={p.style}>
+        <span class:list={['blip', { below: p.below, left: p.left }]} style={p.style}>
           <span class="lbl">{p.code}</span>
         </span>
       ))}
@@ -81,7 +82,7 @@ const places = RADAR_PLACES.map((p) => ({
   }
 
   .radar {
-    /* --k : échelle du radar (1 = 200 px, ≈ 0,75 px/km depuis Mons). */
+    /* --k : échelle du radar (1 = 200 px, ≈ 0,85 px/km depuis Namur). */
     --k: 1;
     --size: calc(200px * var(--k));
     position: relative;
@@ -156,6 +157,11 @@ const places = RADAR_PLACES.map((p) => ({
     top: 9px;
   }
 
+  .blip.left .lbl {
+    left: auto;
+    right: 10px;
+  }
+
   .blip.home {
     width: 10px;
     height: 10px;
@@ -169,9 +175,8 @@ const places = RADAR_PLACES.map((p) => ({
   }
 
   .blip.home .lbl {
-    left: auto;
-    right: 14px;
-    top: -1px;
+    left: -11px;
+    top: -18px;
     color: var(--fg);
     opacity: 1;
     animation: none;

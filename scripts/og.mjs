@@ -35,10 +35,10 @@ const og = `<!doctype html><html><head><style>${css}
 </style></head><body><div class="card">
   <div class="halo"></div><div class="dots"></div>
   <div class="content">
-    <div class="status mono"><span class="beacon"></span>Ouvert aux opportunités</div>
+    <div class="status mono"><span class="beacon"></span>En poste à l’INASEP</div>
     <h1>Ahmad<br>Barutchi<span>.</span></h1>
     <div class="rule"></div>
-    <div class="sub mono"><span>Développeur full-stack · Mons</span><span>abarutchi.web.app</span></div>
+    <div class="sub mono"><span>Informaticien industriel · Namur</span><span>abarutchi.web.app</span></div>
   </div>
 </div></body></html>`;
 

@@ -1,5 +1,5 @@
 /**
- * Heure locale de Mons dans tout élément [data-clock] (« 14:32 CEST »).
+ * Heure locale (Europe/Brussels) dans tout élément [data-clock] (« 14:32 CEST »).
  * Chargé sur toutes les pages par le Footer ; les autres composants posent
  * seulement <span data-clock>--:--</span>. Rafraîchi toutes les 15 s et au
  * retour sur l'onglet. Fuseau : PROFILE.timeZone (src/data/site.ts), recopié
