@@ -38,6 +38,15 @@ Tout le texte du site est dans **`src/data/site.ts`** : profil, statut de dispon
 - Ligne de statut du hero et du contact : `PROFILE.availability` vaut `'busy'` (« En poste à l’INASEP »), `'open'` (« Ouvert aux opportunités ») ou `null` (masquée).
 - Héberger le CV : déposer `public/cv-ahmad-barutchi.pdf` puis mettre `PROFILE.cv = '/cv-ahmad-barutchi.pdf'`.
 
+## Langues
+
+Le site existe en **français** (par défaut, à la racine) et en **anglais** (sous `/en`) : `/` ↔ `/en`, `/projets/robot-secouriste` ↔ `/en/projects/rescue-robot`. Un lien FR / EN dans la navigation mène à la même page dans l'autre langue (et garde la section en cours sur l'accueil) ; les pages déclarent leurs équivalents en `hreflang`.
+
+- Contenu : `src/data/site.ts` (FR) et `src/data/site.en.ts` (EN), `src/data/case-robot.ts` et `case-robot.en.ts`. Chaque export anglais est typé sur son équivalent français : un champ oublié fait échouer `npm run check`.
+- Libellés d'interface (boutons, aria-label, pied de page) : `src/i18n/ui.ts`.
+- La langue d'une page se déduit de son URL ; les composants appellent `useI18n(Astro)` (`src/i18n/index.ts`).
+- La page 404 est commune aux deux langues (texte français, phrase et lien en anglais).
+
 ## Captures de l'étude de cas
 
 Les 12 captures du robot secouriste sont dans `src/assets/projects/robot-secouriste/` (rapatriées depuis imgur par `npm run fetch:images`, qui ne télécharge que celles qui manquent). Si une capture manque, sa figure n'est pas affichée et la couverture utilise une illustration du tableau de bord.
@@ -49,9 +58,10 @@ src/
   components/      sections/ (Hero, About, Parcours, Projects, Skills, Contact),
                    hero/, projects/, case/, shell/ (menu mobile), Nav, Footer,
                    Section, Icon, DashboardFrame
-  data/            site.ts (contenu), case-robot.ts (étude de cas)
-  layouts/         Base.astro (SEO, polices, thème sans flash)
-  pages/           index, projets/[slug], 404
+  data/            site.ts / site.en.ts (contenu), case-robot.ts / case-robot.en.ts (étude de cas)
+  i18n/            langue de la page, libellés d'interface FR / EN
+  layouts/         Base.astro (SEO, hreflang, polices, thème sans flash)
+  pages/           index, projets/[slug], en/index, en/projects/[slug], 404
   scripts/         signal-field, nav, theme, clock
   styles/          global.css (jetons et utilitaires)
 public/            favicon, og.png, robots.txt
@@ -79,11 +89,13 @@ Mesurés par `npm run budget` (gzip) :
 
 | Mesure                          | Mesuré  | Limite |
 | ------------------------------- | ------- | ------ |
-| JS total du site                | 14,1 Ko | 15 Ko  |
-| JS de la page d'accueil         | 6,1 Ko  | 8 Ko   |
-| CSS total                       | 19,9 Ko | 20 Ko  |
+| JS total du site                | 7,5 Ko  | 15 Ko  |
+| JS de la page d'accueil         | 6,3 Ko  | 8 Ko   |
+| CSS total                       | 17,6 Ko | 20 Ko  |
 | Polices (3 fichiers woff2)      | 60,2 Ko | 100 Ko |
-| Chargement initial de l'accueil | 73,7 Ko | 250 Ko |
+| Chargement initial de l'accueil | 73,8 Ko | 250 Ko |
+
+Dans les totaux, un script ou un style inline identique sur plusieurs pages (ou dans les deux langues) n'est compté qu'une fois.
 
 L'ancien site Angular chargeait 142 Ko de JS gzip et 5 fichiers de polices depuis Google Fonts.
 
