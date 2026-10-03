@@ -7,7 +7,8 @@ import { Font } from 'astro:assets';
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { SITE, PROFILE, type NavId } from '../data/site';
+import type { NavId } from '../data/site';
+import { alternates, useI18n, type Lang } from '../i18n';
 
 interface Props {
   title?: string;
@@ -22,6 +23,9 @@ interface Props {
   noindex?: boolean;
 }
 
+const { lang, c, t } = useI18n(Astro);
+const { SITE, PROFILE } = c;
+
 const {
   title = SITE.title,
   description = SITE.description,
@@ -34,6 +38,8 @@ const {
 
 const canonical = new URL(path, SITE.url).toString();
 const ogUrl = new URL(ogImage, SITE.url).toString();
+const alt = alternates(path);
+const OG_LOCALE: Record<Lang, string> = { fr: 'fr_BE', en: 'en_GB' };
 
 const personLd = {
   '@context': 'https://schema.org',
@@ -56,7 +62,7 @@ const personLd = {
 ---
 
 <!doctype html>
-<html lang={SITE.lang}>
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -80,6 +86,13 @@ const personLd = {
     <meta name="description" content={description} />
     <meta name="author" content={PROFILE.name} />
     <link rel="canonical" href={canonical} />
+    {alt && (
+      <>
+        <link rel="alternate" hreflang="fr" href={new URL(alt.fr, SITE.url).toString()} />
+        <link rel="alternate" hreflang="en" href={new URL(alt.en, SITE.url).toString()} />
+        <link rel="alternate" hreflang="x-default" href={new URL(alt.fr, SITE.url).toString()} />
+      </>
+    )}
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#0b0d14" media="(prefers-color-scheme: dark)" />
@@ -90,7 +103,10 @@ const personLd = {
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    {alt && (
+      <meta property="og:locale:alternate" content={OG_LOCALE[lang === 'fr' ? 'en' : 'fr']} />
+    )}
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -111,9 +127,13 @@ const personLd = {
   </head>
   <body>
     <a class="skip-link" href="#contenu">
-      Aller au contenu
+      {t.skip}
     </a>
-    <Nav home={home} current={current} />
+    <Nav
+      home={home}
+      current={current}
+      switchHref={alt ? alt[lang === 'fr' ? 'en' : 'fr'] : undefined}
+    />
     <main id="contenu" tabindex="-1">
       <slot />
     </main>
