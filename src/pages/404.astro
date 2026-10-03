@@ -2,7 +2,8 @@
 /**
  * 404 « Signal perdu » : même champ de points que le hero (il balaie, mais ne
  * réagit plus au pointeur), « 404 » géant, retour à l'accueil.
- * Firebase Hosting sert dist/404.html pour toute adresse inconnue.
+ * Firebase Hosting sert dist/404.html pour toute adresse inconnue, dans les
+ * deux langues : la page est en français, avec une phrase et un lien en anglais.
  */
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
@@ -43,11 +44,17 @@ import { PROFILE } from '../data/site';
       <div class="lost-foot">
         <p class="lede fade fade-1">
           Cette adresse ne mène nulle part&nbsp;: la page a été déplacée, ou n’a jamais existé.
+          <span class="lede-en" lang="en">
+            This address leads nowhere.
+          </span>
         </p>
         <div class="cta fade fade-2">
           <a class="btn btn-primary" href="/" data-magnetic>
             <Icon name="arrow-left" />
             Retour à l’accueil
+          </a>
+          <a class="btn btn-ghost" href="/en" hreflang="en" lang="en" data-magnetic>
+            English home
           </a>
         </div>
       </div>
@@ -181,6 +188,19 @@ import { PROFILE } from '../data/site';
     text-wrap: pretty;
   }
 
+  .lede-en {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.8em;
+    color: var(--fg-3, var(--fg-2));
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
   .btn-primary {
     transition:
       translate 0.16s var(--ease),
@@ -212,7 +232,7 @@ import { PROFILE } from '../data/site';
     }
 
     .cta,
-    .btn-primary {
+    .cta .btn {
       width: 100%;
     }
   }
