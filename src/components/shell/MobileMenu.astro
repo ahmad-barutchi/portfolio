@@ -1,0 +1,229 @@
+---
+/**
+ * Menu mobile plein écran (≤ 820 px) : <dialog> ouvert avec showModal() par le
+ * bouton [data-menu-open] de Nav.astro (top layer, reste de la page inerte,
+ * Échap natif, focus rendu au bouton). Liens géants numérotés qui montent en
+ * cascade, puis « CV · PDF » et « M’écrire ». Comportement : src/scripts/nav.ts.
+ */
+import Icon from '../Icon.astro';
+import { NAV, PROFILE, type NavId } from '../../data/site';
+
+interface Props {
+  id: string;
+  home?: boolean;
+  current?: NavId;
+}
+
+const { id, home = false, current } = Astro.props;
+const href = (target: NavId) => (home ? `#${target}` : `/#${target}`);
+---
+
+<dialog {id} class="overlay" aria-label="Menu">
+  <div class="ov-top">
+    <a
+      class="ov-brand"
+      href={home ? '#accueil' : '/'}
+      aria-label={home ? 'Ahmad Barutchi, haut de page' : 'Ahmad Barutchi, accueil'}
+    >
+      ab<span class="ov-brand-dot" aria-hidden="true"></span>
+    </a>
+    <button class="ov-close" type="button" data-menu-close aria-label="Fermer le menu" autofocus>
+      <Icon name="close" size={20} />
+    </button>
+  </div>
+
+  <nav class="ov-nav" aria-label="Navigation principale">
+    <ol class="ov-links" role="list">
+      {NAV.map((item, i) => (
+        <li style={`--i: ${i}`}>
+          <a
+            class="ov-link"
+            href={href(item.id)}
+            data-nav-id={item.id}
+            aria-current={!home && current === item.id ? 'page' : undefined}
+          >
+            <span class="mono ov-num" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <div class="ov-foot">
+    <a class="btn btn-primary" href={PROFILE.cv} target="_blank" rel="noopener">
+      <Icon name="download" />
+      <span>
+        <span class="visually-hidden">Télécharger le </span>CV · PDF
+      </span>
+    </a>
+    <a class="btn btn-ghost" href={`mailto:${PROFILE.email}`}>
+      <Icon name="mail" />
+      M’écrire
+    </a>
+  </div>
+</dialog>
+
+<style>
+  .overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    /* Bouton fermer et monogramme exactement à la place du bouton menu et du « ab ». */
+    padding: calc(var(--nav-py, 14px) + 5px) calc(var(--nav-px, 16px) + 6px)
+      max(28px, env(safe-area-inset-bottom)) var(--nav-px, 16px);
+    border: 0;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--fg);
+    background: color-mix(in oklch, var(--bg) 94%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    opacity: 0;
+    transition:
+      opacity 0.25s var(--ease),
+      overlay 0.25s allow-discrete,
+      display 0.25s allow-discrete;
+  }
+
+  .overlay[open] {
+    display: flex;
+    opacity: 1;
+    animation: menu-in 0.35s var(--ease) both;
+  }
+
+  .overlay::backdrop {
+    background: transparent;
+  }
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .ov-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .ov-brand {
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    font-weight: 650;
+    font-size: 23px;
+    letter-spacing: -0.06em;
+    text-decoration: none;
+    color: var(--fg);
+  }
+
+  .ov-brand-dot {
+    width: 7px;
+    height: 7px;
+    margin: 12px 0 0 2px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  .ov-close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+
+  .ov-close:hover {
+    background: var(--bg-3);
+    border-color: color-mix(in oklch, var(--fg) 35%, transparent);
+  }
+
+  .ov-close:focus-visible {
+    border-radius: 999px;
+  }
+
+  .ov-nav {
+    margin-top: auto;
+    padding-top: 32px;
+  }
+
+  .ov-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ov-link {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 0;
+    font-size: clamp(40px, 11.3vw, 60px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .overlay[open] .ov-link {
+    animation: sig-fadeup 0.6s var(--ease) both;
+    animation-delay: calc(40ms + var(--i) * 50ms);
+  }
+
+  .ov-num {
+    flex: none;
+    color: var(--accent-text);
+    transform: translateY(-16px);
+  }
+
+  .ov-link:focus-visible {
+    outline-offset: 2px;
+  }
+
+  /* Section courante : une balise ambre au bout de la ligne. */
+  .ov-link[aria-current]::after {
+    content: '';
+    align-self: center;
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  .ov-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .ov-foot .btn {
+    flex: 1 1 140px;
+  }
+</style>

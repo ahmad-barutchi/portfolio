@@ -1,0 +1,281 @@
+---
+/**
+ * Cadre d'application du tableau de bord du robot secouriste.
+ * Avec `image` : affiche la vraie capture. Sans : une illustration du graphe
+ * (vrais noms de séries, courbes stylisées) — décorative, aria-hidden.
+ * Partagé par la tuile vedette du bento et l'en-tête de l'étude de cas.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  image?: ImageMetadata;
+  alt?: string;
+  class?: string;
+  /** Largeurs pour le srcset de la vraie capture. */
+  widths?: number[];
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  /** Nom de transition de vue partagé entre la tuile et l'étude de cas. */
+  transitionName?: string;
+}
+
+const {
+  image,
+  alt = 'Graphe du tableau de bord : températures et humidité relevées par le robot, et courbes de prédiction',
+  class: className,
+  widths = [480, 720, 960, 1280],
+  sizes = '(min-width: 1100px) 640px, 100vw',
+  loading = 'lazy',
+  transitionName,
+} = Astro.props;
+---
+
+<div
+  class:list={['dash', className]}
+  style={transitionName ? `view-transition-name: ${transitionName}` : undefined}
+>
+  <div class="dash-bar" aria-hidden="true">
+    <i></i>
+    <i></i>
+    <i></i>
+    <span class="mono">Tableau de bord · Visualisation</span>
+  </div>
+  {image ? (
+    <Image
+      class="dash-img"
+      src={image}
+      alt={alt}
+      widths={widths}
+      sizes={sizes}
+      loading={loading}
+      decoding="async"
+    />
+  ) : (
+    <div class="dash-body" aria-hidden="true">
+      <div class="dash-rail">
+        <i class="on" />
+        <i />
+        <i />
+        <i />
+      </div>
+      <div class="dash-panel">
+        <div class="dash-legend">
+          <span>
+            <i class="k-pres" />
+            Présence
+          </span>
+          <span>
+            <i class="k-av" />
+            T° avant
+          </span>
+          <span>
+            <i class="k-ar" />
+            T° arrière
+          </span>
+          <span>
+            <i class="k-amb" />
+            T° ambiante
+          </span>
+          <span>
+            <i class="k-hum" />
+            Humidité
+          </span>
+        </div>
+        <svg class="dash-chart" viewBox="0 0 600 220" focusable="false">
+          <line class="grid" x1="0" y1="44" x2="600" y2="44" />
+          <line class="grid" x1="0" y1="88" x2="600" y2="88" />
+          <line class="grid" x1="0" y1="132" x2="600" y2="132" />
+          <line class="grid" x1="0" y1="176" x2="600" y2="176" />
+          <path
+            class="area"
+            d="M0,206 L118,206 C150,206 160,70 196,70 C232,70 242,206 274,206 L410,206 C440,206 452,48 488,48 C524,48 534,206 566,206 L600,206 L600,220 L0,220 Z"
+          />
+          <path
+            class="s s-amb"
+            d="M0,176 C84,172 142,180 204,172 C266,164 322,168 384,170 C446,172 520,174 600,166"
+          />
+          <path
+            class="s s-ar"
+            d="M0,160 C66,150 112,172 172,156 C232,140 270,120 332,130 C394,140 442,168 500,148 C548,132 578,124 600,126"
+          />
+          <path
+            class="s s-av"
+            d="M0,140 C56,122 104,152 164,132 C224,112 262,88 324,100 C386,112 428,152 484,124 C532,100 570,84 600,92"
+          />
+          <path
+            class="s s-hum"
+            d="M0,92 C50,104 104,68 166,78 C228,88 262,116 334,100 C406,84 440,58 506,72 C552,82 580,96 600,90"
+          />
+          <path
+            class="s s-pres"
+            d="M0,206 L118,206 C150,206 160,70 196,70 C232,70 242,206 274,206 L410,206 C440,206 452,48 488,48 C524,48 534,206 566,206 L600,206"
+          />
+          <line class="cursor" x1="488" y1="14" x2="488" y2="206" />
+          <circle class="pt" cx="196" cy="70" r="5" />
+          <circle class="pt" cx="488" cy="48" r="5" />
+        </svg>
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  .dash {
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--bg-3);
+    border: 1px solid var(--line-2);
+    box-shadow: var(--shadow);
+    transition: background-color 0.45s var(--ease);
+  }
+
+  .dash-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dash-bar i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--line-2);
+  }
+
+  .dash-bar .mono {
+    margin-left: 10px;
+    font-size: 9.5px;
+  }
+
+  .dash-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .dash-body {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .dash-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-right: 1px solid var(--line);
+  }
+
+  .dash-rail i {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background: var(--line);
+  }
+
+  .dash-rail i.on {
+    background: color-mix(in oklch, var(--accent) 45%, transparent);
+  }
+
+  .dash-panel {
+    padding: 14px 16px 18px;
+  }
+
+  .dash-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 0 0 10px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+  }
+
+  .dash-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dash-legend i {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .k-pres {
+    background: var(--accent);
+  }
+  .k-av {
+    background: var(--c-av);
+  }
+  .k-ar {
+    background: var(--c-ar);
+  }
+  .k-amb {
+    background: var(--c-amb);
+  }
+  .k-hum {
+    background: var(--c-hum);
+  }
+
+  .dash-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .dash-chart .grid {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .dash-chart .s {
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .dash-chart .s-pres {
+    stroke: var(--accent);
+  }
+  .dash-chart .s-av {
+    stroke: var(--c-av);
+  }
+  .dash-chart .s-ar {
+    stroke: var(--c-ar);
+  }
+  .dash-chart .s-amb {
+    stroke: var(--c-amb);
+    stroke-dasharray: 4 6;
+  }
+  .dash-chart .s-hum {
+    stroke: var(--c-hum);
+  }
+
+  .dash-chart .area {
+    fill: var(--accent);
+    fill-opacity: 0.12;
+  }
+
+  .dash-chart .cursor {
+    stroke: var(--fg-3);
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+  }
+
+  .dash-chart .pt {
+    fill: var(--accent);
+    stroke: var(--bg-3);
+    stroke-width: 3;
+  }
+</style>

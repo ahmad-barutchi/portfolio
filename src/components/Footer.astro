@@ -1,0 +1,331 @@
+---
+/**
+ * Pied de page (HANDOVER 6.9) : filet, mentions en mono discret, heure locale
+ * (src/scripts/clock.ts, chargé ici pour toutes les pages), code source, retour
+ * en haut, et un clin d'œil : une note de musique avec infobulle CSS, visible
+ * au survol comme au focus, que la touche Échap fait disparaître.
+ */
+import Icon from './Icon.astro';
+import { PROFILE, SITE } from '../data/site';
+
+interface Props {
+  /** Accueil : « Haut de page » vise #accueil (sinon #contenu). Déduit de l'URL par défaut. */
+  home?: boolean;
+}
+
+const path = Astro.url.pathname;
+const { home = path === '/' || path === '/index.html' } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-foot">
+  <div class="foot">
+    <p class="mono foot-copy">
+      <span>
+        © {year} {PROFILE.name}
+      </span>
+      <span class="foot-sep" aria-hidden="true">
+        {' '}
+        ·{' '}
+      </span>
+      <span class="foot-made">Conçu et codé à {PROFILE.city}</span>
+    </p>
+
+    <p class="mono foot-clock">
+      <span class="foot-dot" aria-hidden="true"></span>
+      Il est <span data-clock>--:--</span> à {PROFILE.city}
+    </p>
+
+    <ul class="foot-links" role="list">
+      <li>
+        <a class="foot-link" href={SITE.repo} target="_blank" rel="noopener">
+          Code source
+          <Icon name="arrow-up-right" size={14} />
+        </a>
+      </li>
+      <li>
+        <a class="foot-link foot-top" href={home ? '#accueil' : '#contenu'}>
+          Haut de page
+          <Icon name="arrow-up" size={14} />
+        </a>
+      </li>
+      <li class="note" data-note>
+        <button
+          class="note-btn"
+          type="button"
+          aria-label="Note de musique"
+          aria-describedby="note-tip"
+        >
+          <Icon name="music" size={16} />
+        </button>
+        <span class="tip" id="note-tip" role="tooltip">
+          Je donne aussi des cours de musique
+        </span>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  import '../scripts/clock';
+
+  // Infobulle : Échap la masque sans déplacer le focus ni le pointeur (WCAG 1.4.13).
+  const note = document.querySelector<HTMLElement>('[data-note]');
+  if (note) {
+    const reset = () => note.removeAttribute('data-dismissed');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && note.matches(':hover, :focus-within')) {
+        note.setAttribute('data-dismissed', '');
+      }
+    });
+    note.addEventListener('focusout', reset);
+    note.addEventListener('pointerleave', reset);
+  }
+</script>
+
+<style>
+  .site-foot {
+    padding: 0 var(--gutter) max(28px, env(safe-area-inset-bottom));
+  }
+
+  .foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px 32px;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .foot-copy {
+    text-wrap: balance;
+  }
+
+  .foot-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  .foot-clock [data-clock] {
+    color: var(--fg-2);
+  }
+
+  .foot-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .foot-links {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 4px 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .foot-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  .foot-link:hover {
+    color: var(--fg);
+  }
+
+  .foot-link :global(.ic) {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .foot-link:hover :global(.ic) {
+    transform: translate(2px, -2px);
+  }
+
+  .foot-top:hover :global(.ic) {
+    transform: translateY(-2px);
+  }
+
+  /* Clin d'œil musical */
+  .note {
+    --note: 36px;
+    position: relative;
+    display: flex;
+  }
+
+  .note-btn {
+    display: grid;
+    place-items: center;
+    width: var(--note);
+    height: var(--note);
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    background: transparent;
+    color: var(--fg-2);
+    cursor: help;
+    transition:
+      color 0.2s,
+      border-color 0.2s,
+      background-color 0.2s;
+  }
+
+  .note-btn:focus-visible {
+    border-radius: 999px;
+  }
+
+  .note:hover .note-btn,
+  .note-btn:focus-visible {
+    color: var(--accent-text);
+    border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+    background: color-mix(in oklch, var(--accent) 10%, transparent);
+  }
+
+  .note:hover .note-btn :global(.ic) {
+    animation: note-sway 0.9s var(--ease);
+  }
+
+  @keyframes note-sway {
+    30% {
+      transform: rotate(-12deg) translateY(-1px);
+    }
+    65% {
+      transform: rotate(8deg);
+    }
+  }
+
+  .tip {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 12px);
+    z-index: 2;
+    width: max-content;
+    max-width: min(260px, calc(100vw - 2 * var(--gutter)));
+    padding: 9px 13px;
+    border-radius: 10px;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    /* Disparition retardée : le pointeur a le temps de rejoindre l'infobulle. */
+    transition:
+      opacity 0.16s var(--ease) 0.22s,
+      transform 0.16s var(--ease) 0.22s,
+      visibility 0s linear 0.38s;
+  }
+
+  /* Pointe, et pont invisible qui garde l'infobulle survolable. */
+  .tip::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 14px;
+  }
+
+  .tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: calc(var(--note) / 2 - 5px);
+    border: 5px solid transparent;
+    border-top-color: var(--fg);
+  }
+
+  .note:not([data-dismissed]):hover .tip,
+  .note:not([data-dismissed]):focus-within .tip {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  /* Échap : disparition immédiate. */
+  .note[data-dismissed] .tip {
+    transition-delay: 0s;
+  }
+
+  @media (max-width: 1040px) {
+    .foot {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .foot-clock {
+      grid-row: 2;
+    }
+
+    .foot-links {
+      grid-row: 1 / span 2;
+      grid-column: 2;
+    }
+  }
+
+  /* Mobile : une colonne, cibles de 44 px. Les liens passent en tête (ordre
+     visuel seulement, ils restent les seuls éléments focalisables) : la note
+     est au bout de la première ligne, son infobulle s'ouvre dans le vide
+     au-dessus du filet au lieu de masquer l'heure. */
+  @media (max-width: 620px) {
+    .foot {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      padding-top: 10px;
+    }
+
+    .foot-links {
+      order: -1;
+    }
+
+    .foot-made {
+      display: block;
+    }
+
+    .foot-sep {
+      display: none;
+    }
+
+    .foot-clock,
+    .foot-links {
+      grid-row: auto;
+      grid-column: auto;
+    }
+
+    .foot-links {
+      justify-self: stretch;
+      margin-bottom: 8px;
+    }
+
+    .foot-link {
+      min-height: 44px;
+    }
+
+    .note {
+      --note: 44px;
+      margin-left: auto;
+    }
+  }
+</style>

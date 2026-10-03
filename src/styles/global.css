@@ -1,0 +1,589 @@
+/* ==========================================================================
+   SIGNAL — système de design global
+   Jetons, base, utilitaires partagés. Les composants ajoutent leurs styles
+   dans leur propre <style> (scopé). Ne pas dupliquer ici ce qui est local.
+   Référence visuelle : maquette « Portfolio SIGNAL » (voir HANDOVER.md).
+   ========================================================================== */
+
+@layer tokens, base, utilities;
+
+@view-transition {
+  navigation: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Jetons
+   Thème sombre par défaut ; clair via [data-theme="light"] (posé avant le
+   premier rendu par le script inline de Base.astro), ou via la préférence
+   système quand JS est désactivé.
+   -------------------------------------------------------------------------- */
+@layer tokens {
+  :root {
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 160ms;
+    --dur: 240ms;
+    --dur-slow: 400ms;
+
+    --sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+    --serif: var(--font-instrument), Georgia, serif;
+    --mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --gutter: clamp(20px, 5vw, 80px);
+    --container: 1280px;
+    --nav-offset: 92px;
+    --radius-s: 7px;
+    --radius-m: 14px;
+    --radius-l: 22px;
+
+    /* Sombre (défaut) */
+    --bg: oklch(14% 0.015 260);
+    --bg-2: oklch(18% 0.015 260);
+    --bg-3: oklch(22.5% 0.016 260);
+    --fg: oklch(95% 0.01 80);
+    --fg-2: oklch(76% 0.012 260);
+    --fg-3: oklch(64% 0.012 260);
+    --ink: oklch(17% 0.02 260);
+    --line: color-mix(in oklch, var(--fg) 9%, transparent);
+    --line-2: color-mix(in oklch, var(--fg) 17%, transparent);
+    --accent: #ffb454;
+    --accent-text: var(--accent);
+    --accent-rgb: 255 180 84;
+    --dot-rgb: 150 157 178;
+    --dot-alpha: 0.32;
+    --halo-a: color-mix(in oklch, var(--accent) 10%, transparent);
+    --halo-b: oklch(55% 0.13 262 / 0.16);
+    --shadow: 0 40px 80px -30px rgb(0 0 0 / 0.8);
+    --shadow-card: inset 0 1px 0 color-mix(in oklch, var(--fg) 5%, transparent);
+    --c-av: oklch(74% 0.12 250);
+    --c-ar: oklch(80% 0.1 190);
+    --c-amb: oklch(64% 0.012 260);
+    --c-hum: oklch(73% 0.13 320);
+    color-scheme: dark;
+  }
+
+  :root[data-theme='light'] {
+    --bg: oklch(97% 0.008 80);
+    --bg-2: #fff;
+    --bg-3: oklch(94.5% 0.01 80);
+    --fg: oklch(19% 0.015 260);
+    --fg-2: oklch(44% 0.012 260);
+    --fg-3: oklch(50% 0.012 260);
+    --line: color-mix(in oklch, var(--fg) 11%, transparent);
+    --line-2: color-mix(in oklch, var(--fg) 20%, transparent);
+    --accent: #e0781a;
+    --accent-text: #a14e00;
+    --accent-rgb: 224 120 26;
+    --dot-rgb: 92 97 114;
+    --dot-alpha: 0.3;
+    --halo-a: color-mix(in oklch, var(--accent) 14%, transparent);
+    --halo-b: oklch(72% 0.1 262 / 0.16);
+    --shadow: 0 30px 60px -28px rgb(20 22 30 / 0.35);
+    --shadow-card: 0 1px 2px rgb(20 22 30 / 0.04), 0 12px 32px -16px rgb(20 22 30 / 0.14);
+    --c-av: oklch(55% 0.15 255);
+    --c-ar: oklch(58% 0.1 195);
+    --c-amb: oklch(58% 0.012 260);
+    --c-hum: oklch(55% 0.16 320);
+    color-scheme: light;
+  }
+
+  /* Sans JavaScript : suivre la préférence système. */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      --bg: oklch(97% 0.008 80);
+      --bg-2: #fff;
+      --bg-3: oklch(94.5% 0.01 80);
+      --fg: oklch(19% 0.015 260);
+      --fg-2: oklch(44% 0.012 260);
+      --fg-3: oklch(50% 0.012 260);
+      --line: color-mix(in oklch, var(--fg) 11%, transparent);
+      --line-2: color-mix(in oklch, var(--fg) 20%, transparent);
+      --accent: #e0781a;
+      --accent-text: #a14e00;
+      --accent-rgb: 224 120 26;
+      --dot-rgb: 92 97 114;
+      --dot-alpha: 0.3;
+      --halo-a: color-mix(in oklch, var(--accent) 14%, transparent);
+      --halo-b: oklch(72% 0.1 262 / 0.16);
+      --shadow: 0 30px 60px -28px rgb(20 22 30 / 0.35);
+      --shadow-card: 0 1px 2px rgb(20 22 30 / 0.04), 0 12px 32px -16px rgb(20 22 30 / 0.14);
+      --c-av: oklch(55% 0.15 255);
+      --c-ar: oklch(58% 0.1 195);
+      --c-amb: oklch(58% 0.012 260);
+      --c-hum: oklch(55% 0.16 320);
+      color-scheme: light;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--nav-offset);
+    background: var(--bg);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    transition:
+      background-color 0.45s var(--ease),
+      color 0.45s var(--ease);
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  img {
+    height: auto;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--accent) 35%, transparent);
+    color: var(--fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -100px;
+    z-index: 100;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .skip-link:focus {
+    top: 16px;
+  }
+
+  [id] {
+    scroll-margin-top: var(--nav-offset);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Utilitaires partagés (contrat entre composants)
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Mise en page */
+  .section {
+    position: relative;
+    padding: clamp(88px, 9vw, 140px) var(--gutter);
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(36px, 4vw, 52px);
+  }
+
+  .sec-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  /* Typographie */
+  .mono {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .serif {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    font-size: 1.06em;
+    padding-right: 0.04em;
+  }
+
+  .dot-accent {
+    color: var(--accent);
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+  }
+
+  .label-num {
+    color: var(--accent-text);
+  }
+
+  .label-line {
+    width: 36px;
+    height: 1px;
+    background: var(--line-2);
+  }
+
+  .h2 {
+    font-weight: 600;
+    font-size: clamp(40px, 5.6vw, 84px);
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .h3-xl {
+    font-weight: 600;
+    font-size: clamp(32px, 3.3vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .h3 {
+    font-weight: 600;
+    font-size: 23px;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  .lead {
+    font-size: clamp(20px, 2vw, 28px);
+    line-height: 1.42;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    text-wrap: pretty;
+  }
+
+  .body {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .sub {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--fg-2);
+  }
+
+  /* Icônes (voir Icon.astro) */
+  .ic {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex: none;
+  }
+
+  /* Boutons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 24px;
+    border-radius: var(--radius-m);
+    border: 1px solid transparent;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease),
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .btn .ic {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--ink);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 10px 34px -10px color-mix(in oklch, var(--accent) 70%, transparent);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      0 18px 44px -12px color-mix(in oklch, var(--accent) 85%, transparent);
+  }
+
+  .btn-ghost {
+    color: var(--fg);
+    border-color: var(--line-2);
+    background: color-mix(in oklch, var(--bg-2) 55%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .btn-ghost:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--fg) 40%, transparent);
+  }
+
+  /* Liens */
+  .link-arrow,
+  .link-accent,
+  .link-quiet {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .link-arrow {
+    gap: 8px;
+    min-height: 44px;
+    color: var(--fg);
+    border-bottom: 1px solid var(--line-2);
+    transition: border-color 0.2s;
+  }
+
+  .link-arrow:hover {
+    border-color: var(--accent);
+  }
+
+  .link-accent {
+    color: var(--accent-text);
+  }
+
+  .link-quiet {
+    color: var(--fg-2);
+    transition: color 0.2s;
+  }
+
+  .link-quiet:hover {
+    color: var(--fg);
+  }
+
+  .link-arrow .ic,
+  .link-accent .ic,
+  .link-quiet .ic {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .link-arrow:hover .ic,
+  .link-quiet:hover .ic {
+    transform: translate(2px, -2px);
+  }
+
+  .link-accent:hover .ic {
+    transform: translateX(3px);
+  }
+
+  /* Puces, badges */
+  .chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chips li,
+  .chip {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    padding: 7px 10px;
+    border-radius: var(--radius-s);
+    background: var(--bg-3);
+    border: 1px solid var(--line);
+    color: var(--fg-2);
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    padding: 7px 11px;
+    border-radius: 999px;
+    color: var(--accent-text);
+    background: color-mix(in oklch, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in oklch, var(--accent) 32%, transparent);
+    white-space: nowrap;
+  }
+
+  /* Balise (point ambre qui pulse) */
+  .beacon {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .beacon::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    animation: sig-ping 2.4s var(--ease) infinite;
+  }
+
+  /* Révélation au scroll, CSS pur. Sans support : contenu simplement visible. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: sig-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@keyframes sig-ping {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes sig-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.985);
+  }
+}
+
+@keyframes sig-fadeup {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+
+  .reveal {
+    animation: none !important;
+  }
+
+  @view-transition {
+    navigation: none;
+  }
+}

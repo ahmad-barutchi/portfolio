@@ -1,0 +1,66 @@
+name: Build, test et déploiement
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ABARUTCHI }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Récupère les captures du TFE (hébergées sur imgur) si elles ne sont pas encore dans le dépôt.
+      - name: Captures de l'étude de cas
+        run: npm run fetch:images || true
+
+      - run: npm run check
+      - run: npm run build
+      - run: npm run budget
+
+      - name: Tests de fumée
+        run: |
+          npx playwright install --with-deps chromium
+          npm test
+
+      - name: Prévisualisation (pull request)
+        if: github.event_name == 'pull_request' && env.FIREBASE_SA != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ABARUTCHI }}
+          projectId: abarutchi
+          expires: 7d
+
+      - name: Déploiement en production
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && env.FIREBASE_SA != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ABARUTCHI }}
+          projectId: abarutchi
+          channelId: live
+
+      - name: Déploiement ignoré
+        if: env.FIREBASE_SA == ''
+        run: echo "::notice::Secret FIREBASE_SERVICE_ACCOUNT_ABARUTCHI absent, déploiement ignoré (voir README)."

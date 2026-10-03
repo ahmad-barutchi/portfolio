@@ -1,0 +1,396 @@
+---
+/**
+ * 02 — Parcours : frise des expériences (rail qui se dessine au scroll) et formations.
+ * Référence : maquette About.dc.html.
+ */
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import { EDUCATION, EXPERIENCES, SECTIONS } from '../../data/site';
+
+const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
+const summary = `${plural(EXPERIENCES.length, 'expérience', 'expériences')} · ${plural(EDUCATION.length, 'formation', 'formations')}`;
+const years = EDUCATION.map((e) => e.period.match(/\d{4}/g) ?? [])
+  .flat()
+  .map(Number);
+const eduRange = `${Math.min(...years)} – ${Math.max(...years)}`;
+---
+
+<Section id="parcours" index={SECTIONS.parcours.index} label={SECTIONS.parcours.label}>
+  <Fragment slot="title">
+    Expériences qui <em class="serif">comptent</em>.
+  </Fragment>
+  <p slot="aside" class="mono aside">
+    {summary}
+  </p>
+
+  <div class="tl-wrap">
+    <div class="tl-line" aria-hidden="true"></div>
+    <div class="tl-progress" aria-hidden="true"></div>
+    <ol class="tl">
+      {EXPERIENCES.map((xp) => (
+        <li class:list={['tl-item', 'reveal', { featured: xp.featured }]}>
+          <span class="tl-year" aria-hidden="true">
+            {xp.year}
+          </span>
+          <span class="tl-node" aria-hidden="true" />
+          <article class="tl-card">
+            <header class="tl-head">
+              <div>
+                <h3 class="tl-role">
+                  {xp.role}
+                  {xp.badge && <span class="badge">{xp.badge}</span>}
+                </h3>
+                <p class="tl-org">{[xp.org, xp.place, xp.mode].filter(Boolean).join(' · ')}</p>
+              </div>
+              <p class="mono tl-period">{xp.period}</p>
+            </header>
+            <p class="tl-desc">{xp.description}</p>
+            {xp.stack && (
+              <ul class="chips" aria-label="Technologies">
+                {xp.stack.map((tech) => (
+                  <li>{tech}</li>
+                ))}
+              </ul>
+            )}
+            {xp.link && (
+              <p class="tl-more">
+                <a class="link-quiet" href={xp.link.href} target="_blank" rel="noopener">
+                  {xp.link.label}
+                  <Icon name="arrow-up-right" size={15} />
+                </a>
+              </p>
+            )}
+          </article>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <div class="edu-block">
+    <div class="edu-head">
+      <h3 class="h3-xl">Formations</h3>
+      <p class="mono">{eduRange}</p>
+    </div>
+    <ul class="edu">
+      {EDUCATION.map((ed) => (
+        <li class:list={['edu-card', 'reveal', { featured: ed.featured }]}>
+          <p class="mono edu-period">{ed.period}</p>
+          <h4 class="edu-school">{ed.school}</h4>
+          <p class="edu-place">{ed.place}</p>
+          <p class="edu-title">{ed.title}</p>
+          {ed.link && (
+            <a class="link-quiet" href={ed.link.href} target="_blank" rel="noopener">
+              {ed.link.label}
+              <Icon name="arrow-up-right" size={14} />
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</Section>
+
+<style>
+  .aside {
+    margin-bottom: 8px;
+  }
+
+  /* Frise */
+  .tl-wrap {
+    --yearw: 132px;
+    position: relative;
+  }
+
+  .tl-line,
+  .tl-progress {
+    position: absolute;
+    left: calc(var(--yearw) + 20px);
+    top: 18px;
+    bottom: 18px;
+    width: 1px;
+  }
+
+  .tl-line {
+    background: var(--line-2);
+  }
+
+  .tl-progress {
+    background: linear-gradient(
+      to bottom,
+      var(--accent),
+      color-mix(in oklch, var(--accent) 25%, transparent)
+    );
+    transform-origin: 50% 0;
+  }
+
+  @supports (animation-timeline: view()) {
+    .tl-progress {
+      animation: tl-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 25% cover 65%;
+    }
+  }
+
+  @keyframes tl-draw {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  .tl {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: var(--yearw) 41px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .tl-year {
+    padding-top: 22px;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--fg-3);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s;
+  }
+
+  .tl-item:hover .tl-year,
+  .tl-item.featured .tl-year {
+    color: var(--fg);
+  }
+
+  .tl-node {
+    justify-self: center;
+    position: relative;
+    z-index: 1;
+    margin-top: 28px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--fg-3);
+    transition:
+      border-color 0.3s,
+      background-color 0.3s;
+  }
+
+  .tl-item:hover .tl-node {
+    border-color: var(--accent);
+  }
+
+  .tl-item.featured .tl-node {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow:
+      0 0 0 5px color-mix(in oklch, var(--accent) 16%, transparent),
+      0 0 18px var(--accent);
+  }
+
+  .tl-card {
+    position: relative;
+    padding: 22px 26px 24px;
+    border-radius: 20px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 0.3s,
+      transform 0.4s var(--ease),
+      background-color 0.45s var(--ease);
+  }
+
+  .tl-item:hover .tl-card {
+    border-color: var(--line-2);
+    transform: translateX(4px);
+  }
+
+  .tl-item.featured .tl-card {
+    border-color: color-mix(in oklch, var(--accent) 50%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, var(--accent) 22%, transparent),
+      0 24px 60px -36px color-mix(in oklch, var(--accent) 60%, transparent);
+  }
+
+  .tl-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 20px;
+  }
+
+  .tl-role {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  .tl-role .badge {
+    margin-left: 10px;
+    vertical-align: 3px;
+  }
+
+  .tl-org {
+    margin-top: 5px;
+    font-size: 15px;
+    color: var(--fg-2);
+  }
+
+  .tl-period {
+    white-space: nowrap;
+  }
+
+  .tl-item.featured .tl-period {
+    color: var(--accent-text);
+  }
+
+  .tl-desc {
+    margin-top: 12px;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--fg-2);
+    max-width: 62ch;
+  }
+
+  .tl-card .chips {
+    margin-top: 14px;
+  }
+
+  .tl-more {
+    margin-top: 10px;
+  }
+
+  /* Formations */
+  .edu-block {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  .edu-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 30px;
+    border-top: 1px solid var(--line);
+  }
+
+  .edu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .edu-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 18px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 0.3s,
+      transform 0.4s var(--ease),
+      background-color 0.45s var(--ease);
+  }
+
+  .edu-card:hover {
+    border-color: var(--line-2);
+    transform: translateY(-3px);
+  }
+
+  .edu-card.featured {
+    border-color: color-mix(in oklch, var(--accent) 50%, transparent);
+  }
+
+  .edu-card.featured .edu-period {
+    color: var(--accent-text);
+  }
+
+  .edu-school {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  .edu-place {
+    font-size: 13.5px;
+    color: var(--fg-3);
+  }
+
+  .edu-title {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--fg-2);
+  }
+
+  .edu-card .link-quiet {
+    font-size: 14px;
+    margin-top: auto;
+  }
+
+  @media (max-width: 1100px) {
+    .edu {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 820px) {
+    .edu {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .tl-wrap {
+      --yearw: 0px;
+    }
+
+    .tl-year {
+      display: none;
+    }
+
+    .tl-item {
+      grid-template-columns: 28px minmax(0, 1fr);
+    }
+
+    .tl-line,
+    .tl-progress {
+      left: 14px;
+    }
+
+    .tl-card {
+      padding: 18px 18px 20px;
+    }
+
+    .tl-role {
+      font-size: 19px;
+    }
+
+    .tl-item:hover .tl-card {
+      transform: none;
+    }
+
+    .edu {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

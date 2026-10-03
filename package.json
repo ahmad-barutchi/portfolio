@@ -1,8 +1,37 @@
 {
+  "name": "abarutchi-portfolio",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio d'Ahmad Barutchi — site statique Astro, design SIGNAL.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "playwright test",
+    "budget": "node scripts/budget.mjs",
+    "og": "node scripts/og.mjs",
+    "fetch:images": "node scripts/fetch-tfe-images.mjs",
+    "deploy": "firebase deploy --only hosting"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
-    "animejs": "^3.2.1"
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "astro": "^7.3.5"
   },
   "devDependencies": {
-    "@types/animejs": "^3.1.7"
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "1.56.1",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
+    "typescript": "^6.0.3"
   }
 }

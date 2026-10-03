@@ -1,0 +1,241 @@
+---
+/**
+ * 04 — Compétences : carte de stack reliée. Survol/focus d'une puce → les
+ * compétences liées s'allument ; clic → épingle (aria-pressed), Échap → libère.
+ */
+import Section from '../Section.astro';
+import { SECTIONS, SKILL_GROUPS, SKILLS_PROFILE } from '../../data/site';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<Section id="competences" index={SECTIONS.competences.index} label={SECTIONS.competences.label}>
+  <Fragment slot="title">
+    Une boîte à outils <em class="serif">reliée</em>.
+  </Fragment>
+  <p slot="aside" class="mono hint">
+    Survolez ou touchez une compétence
+  </p>
+
+  <p class="lead intro">{SKILLS_PROFILE}</p>
+
+  <div class="skills" data-skills>
+    {SKILL_GROUPS.map((group) => (
+      <section class="group reveal" aria-labelledby={`skills-${group.id}`}>
+        <header class="group-head">
+          <h3 id={`skills-${group.id}`} class="mono group-label">
+            {group.label}
+          </h3>
+          <span class="mono group-count" aria-hidden="true">
+            {pad(group.items.length)}
+          </span>
+        </header>
+        <ul class="group-list">
+          {group.items.map((skill) => (
+            <li>
+              <button
+                type="button"
+                class="skill"
+                data-skill={skill.id}
+                data-links={(skill.links ?? []).join(' ')}
+                aria-pressed="false"
+              >
+                {skill.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+  <p class="visually-hidden" role="status" data-skills-status></p>
+</Section>
+
+<style>
+  .hint {
+    margin-bottom: 8px;
+  }
+
+  .intro {
+    max-width: 34ch;
+  }
+
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px;
+    border-radius: 20px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.45s var(--ease);
+  }
+
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .group-label {
+    font-size: 12px;
+    color: var(--fg-2);
+  }
+
+  .group-count {
+    color: var(--accent-text);
+  }
+
+  .group-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .skill {
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--bg-3);
+    color: var(--fg-2);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      opacity 0.2s var(--ease),
+      color 0.2s,
+      background-color 0.2s,
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .skill:hover {
+    color: var(--fg);
+    border-color: var(--line-2);
+  }
+
+  /* États pilotés par le script : la grille reçoit data-active. */
+  .skills[data-active] .skill {
+    opacity: 0.35;
+  }
+
+  .skills[data-active] .skill.is-lit {
+    opacity: 1;
+    color: var(--fg);
+    border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+    background: color-mix(in oklch, var(--accent) 14%, var(--bg-3));
+  }
+
+  .skills[data-active] .skill.is-source {
+    opacity: 1;
+    color: var(--ink);
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 8px 26px -10px color-mix(in oklch, var(--accent) 80%, transparent);
+  }
+
+  .skill[aria-pressed='true'] {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 1100px) {
+    .skills {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .skills {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .skill {
+      min-height: 44px;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-skills]');
+  const status = document.querySelector<HTMLElement>('[data-skills-status]');
+  if (root) {
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-skill]'));
+    const byId = new Map(buttons.map((b) => [b.dataset.skill!, b]));
+    // Liens symétriques : si A cite B, B s'allume aussi pour A.
+    const links = new Map<string, Set<string>>(buttons.map((b) => [b.dataset.skill!, new Set()]));
+    for (const b of buttons) {
+      for (const id of (b.dataset.links ?? '').split(' ').filter((x) => byId.has(x))) {
+        links.get(b.dataset.skill!)!.add(id);
+        links.get(id)!.add(b.dataset.skill!);
+      }
+    }
+
+    let pinned: string | null = null;
+
+    const show = (id: string | null) => {
+      const related = id ? links.get(id)! : new Set<string>();
+      if (id) root.dataset.active = id;
+      else delete root.dataset.active;
+      for (const b of buttons) {
+        const sid = b.dataset.skill!;
+        b.classList.toggle('is-source', sid === id);
+        b.classList.toggle('is-lit', related.has(sid));
+      }
+    };
+
+    const announce = (id: string) => {
+      if (!status) return;
+      const label = byId.get(id)!.textContent!.trim();
+      const names = [...links.get(id)!].map((x) => byId.get(x)!.textContent!.trim());
+      status.textContent = names.length
+        ? `${label} : lié à ${names.join(', ')}.`
+        : `${label} : aucune compétence liée.`;
+    };
+
+    const pin = (id: string | null) => {
+      pinned = id;
+      for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.skill === id));
+      show(id);
+      if (id) announce(id);
+    };
+
+    for (const b of buttons) {
+      const id = b.dataset.skill!;
+      b.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse') show(id);
+      });
+      b.addEventListener('pointerleave', (e) => {
+        if (e.pointerType === 'mouse') show(pinned);
+      });
+      b.addEventListener('focus', () => {
+        show(id);
+        announce(id);
+      });
+      b.addEventListener('blur', () => show(pinned));
+      b.addEventListener('click', () => pin(pinned === id ? null : id));
+    }
+
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && pinned) pin(null);
+    });
+  }
+</script>

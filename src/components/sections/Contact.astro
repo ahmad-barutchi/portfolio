@@ -1,0 +1,358 @@
+---
+/**
+ * 05 — Contact : adresse e-mail géante qui se copie au clic (toast en top layer),
+ * liens sociaux magnétiques, écho visuel du hero (trame de points, halo).
+ */
+import Section from '../Section.astro';
+import Icon from '../Icon.astro';
+import { CONTACT, PROFILE, SECTIONS, splitEmphasis } from '../../data/site';
+
+const title = splitEmphasis(CONTACT.title);
+const [mailUser, mailDomain] = PROFILE.email.split('@');
+const status = PROFILE.availability ? PROFILE.availabilityLabel[PROFILE.availability] : null;
+const icons = { linkedin: 'linkedin', github: 'github', apprentus: 'music' } as const;
+---
+
+<div class="contact-wrap">
+  <div class="echo" aria-hidden="true"></div>
+  <Section
+    id="contact"
+    index={SECTIONS.contact.index}
+    label={SECTIONS.contact.label}
+    class="contact"
+  >
+    <Fragment slot="title">
+      {title.map((part) => (part.em ? <em class="serif">{part.text}</em> : part.text))}
+    </Fragment>
+
+    <div class="body-grid">
+      <div class="copy">
+        <p class="lead intro">{CONTACT.intro}</p>
+        {status && (
+          <p class="mono status">
+            <span class="beacon" aria-hidden="true" />
+            {status} · {PROFILE.city}, {PROFILE.country}
+          </p>
+        )}
+      </div>
+
+      <div class="mail-block">
+        <button type="button" class="email" data-copy={PROFILE.email}>
+          <span class="email-text">
+            {mailUser}@<wbr />
+            {mailDomain}
+          </span>
+          <span class="email-hint mono" aria-hidden="true">
+            <Icon name="copy" size={14} /> Copier
+          </span>
+          <span class="visually-hidden">: copier l’adresse dans le presse-papiers</span>
+        </button>
+        <a class="link-quiet mailto" href={`mailto:${PROFILE.email}`}>
+          <Icon name="mail" size={16} />
+          ou ouvrir votre messagerie
+        </a>
+      </div>
+    </div>
+
+    <ul class="links" data-magnet-zone>
+      {CONTACT.links.map((link) => (
+        <li>
+          <a class="social" href={link.href} target="_blank" rel="noopener" data-magnet>
+            <Icon name={icons[link.id]} size={20} />
+            <span>{link.label}</span>
+            <Icon name="arrow-up-right" size={16} class="go" />
+          </a>
+        </li>
+      ))}
+      <li>
+        <a class="social" href={PROFILE.phoneHref} data-magnet>
+          <Icon name="phone" size={20} />
+          <span>{PROFILE.phone}</span>
+        </a>
+      </li>
+    </ul>
+  </Section>
+
+  <div class="toast" popover="manual" aria-hidden="true" data-copy-toast>
+    <Icon name="check" size={16} />
+    Adresse copiée
+  </div>
+  <p class="visually-hidden" role="status" data-copy-status></p>
+</div>
+
+<style>
+  .contact-wrap {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .echo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(40% 55% at 85% 40%, var(--halo-a), transparent 70%),
+      radial-gradient(
+          circle,
+          rgb(var(--dot-rgb) / calc(var(--dot-alpha) * 0.9)) 1px,
+          transparent 1.3px
+        )
+        0 0 / 28px 28px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  }
+
+  .contact :global(.h2) {
+    font-size: clamp(52px, 9vw, 140px);
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .body-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(28px, 5vw, 80px);
+    align-items: end;
+  }
+
+  .copy {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .intro {
+    color: var(--fg-2);
+    max-width: 30ch;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--fg);
+  }
+
+  .mail-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .email {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 18px;
+    max-width: 100%;
+    padding: 0 0 14px;
+    border: 0;
+    background: none;
+    color: var(--fg);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .email::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--line-2);
+    transform-origin: 0 50%;
+  }
+
+  .email::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.6s var(--ease);
+  }
+
+  .email:hover::before,
+  .email:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .email-text {
+    font-size: clamp(24px, 3.4vw, 50px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+  }
+
+  .email-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--fg-3);
+    transition: color 0.2s;
+  }
+
+  .email:hover .email-hint {
+    color: var(--accent-text);
+  }
+
+  .mailto {
+    gap: 9px;
+  }
+
+  .links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .social {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 0 20px;
+    border-radius: 16px;
+    border: 1px solid var(--line-2);
+    background: color-mix(in oklch, var(--bg-2) 70%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: var(--fg);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      translate 0.16s var(--ease),
+      border-color 0.2s,
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .social :global(.go) {
+    color: var(--fg-3);
+    transition:
+      transform 0.3s var(--ease),
+      color 0.2s;
+  }
+
+  .social:hover {
+    border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+    background: color-mix(in oklch, var(--accent) 10%, var(--bg-2));
+  }
+
+  .social:hover :global(.go) {
+    color: var(--accent-text);
+    transform: translate(2px, -2px);
+  }
+
+  .toast {
+    position: fixed;
+    inset: auto auto 28px 50%;
+    translate: -50% 0;
+    margin: 0;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklch, var(--accent) 45%, transparent);
+    background: var(--bg-2);
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+  }
+
+  .toast:popover-open {
+    display: inline-flex;
+    animation: sig-fadeup 0.3s var(--ease) both;
+  }
+
+  .toast :global(.ic) {
+    color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .body-grid {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .links {
+      flex-direction: column;
+    }
+
+    .social {
+      width: 100%;
+    }
+
+    .social :global(.go) {
+      margin-left: auto;
+    }
+  }
+</style>
+
+<script>
+  import { magnetize } from '../hero/magnetic';
+
+  const button = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const toast = document.querySelector<HTMLElement>('[data-copy-toast]');
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+  let timer = 0;
+
+  const copy = async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Repli : sélection d'un champ temporaire (contextes sans API Clipboard).
+      const field = document.createElement('textarea');
+      field.value = text;
+      field.setAttribute('readonly', '');
+      field.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+      document.body.append(field);
+      field.select();
+      const ok = document.execCommand('copy');
+      field.remove();
+      return ok;
+    }
+  };
+
+  button?.addEventListener('click', async () => {
+    const ok = await copy(button.dataset.copy!);
+    if (!ok) {
+      window.location.href = `mailto:${button.dataset.copy}`;
+      return;
+    }
+    if (status) status.textContent = 'Adresse e-mail copiée dans le presse-papiers.';
+    if (toast && 'showPopover' in toast) {
+      clearTimeout(timer);
+      if (!toast.matches(':popover-open')) toast.showPopover();
+      timer = window.setTimeout(() => {
+        toast.hidePopover();
+        if (status) status.textContent = '';
+      }, 1600);
+    }
+  });
+
+  const zone = document.querySelector<HTMLElement>('[data-magnet-zone]');
+  if (zone) {
+    for (const el of zone.querySelectorAll<HTMLElement>('[data-magnet]')) magnetize(el, zone);
+  }
+</script>

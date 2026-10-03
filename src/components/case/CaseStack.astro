@@ -1,0 +1,71 @@
+---
+/**
+ * Stack de l'étude de cas : une ligne par technologie, chip mono + rôle.
+ */
+import type { CaseStackItem } from '../../data/case-robot';
+
+interface Props {
+  items: readonly CaseStackItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<dl class="stack">
+  {items.map((item) => (
+    <div class="stack-row">
+      <dt>
+        <span class="chip">{item.name}</span>
+      </dt>
+      <dd>{item.role}</dd>
+    </div>
+  ))}
+</dl>
+
+<style>
+  .stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 28px;
+    margin: 4px 0 0;
+  }
+
+  .stack-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  dt {
+    margin: 0;
+  }
+
+  .chip {
+    display: inline-block;
+    color: var(--fg);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.5;
+    color: var(--fg-2);
+  }
+
+  @media (max-width: 560px) {
+    .stack {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .stack-row {
+      display: grid;
+      grid-template-columns: 124px minmax(0, 1fr);
+      align-items: baseline;
+      gap: 14px;
+      padding: 14px 0;
+    }
+  }
+</style>

@@ -1,0 +1,213 @@
+---
+/**
+ * Journal des hackathons (tuile 3×1) : liste ordonnée date · événement · lieu,
+ * avec un lien ↗ vers le dépôt quand il existe.
+ */
+import Tile from './Tile.astro';
+import Icon from '../Icon.astro';
+import { HACKATHONS } from '../../data/site';
+
+const MONTHS: Record<string, string> = {
+  jan: '01',
+  fév: '02',
+  mar: '03',
+  avr: '04',
+  mai: '05',
+  juin: '06',
+  juil: '07',
+  août: '08',
+  sept: '09',
+  oct: '10',
+  nov: '11',
+  déc: '12',
+};
+
+/** « Fév 2023 » → « 2023-02 » (attribut datetime), undefined si le format est inconnu. */
+function isoMonth(date: string): string | undefined {
+  const [month = '', year = ''] = date.toLowerCase().split(/\s+/);
+  const mm = MONTHS[month.replace(/\.$/, '')];
+  return mm && /^\d{4}$/.test(year) ? `${year}-${mm}` : undefined;
+}
+
+const count = HACKATHONS.length;
+---
+
+<Tile variant="log" aria-labelledby="journal-hackathons-titre">
+  <div class="head">
+    <h3 id="journal-hackathons-titre" class="mono">
+      Journal des hackathons
+    </h3>
+    <p class="mono count">
+      {count} {count > 1 ? 'participations' : 'participation'}
+    </p>
+  </div>
+
+  <ol class="log">
+    {HACKATHONS.map((h) => (
+      <li class="row">
+        <time class="mono date" datetime={isoMonth(h.date)}>
+          {h.date}
+        </time>
+        <span class="visually-hidden"> : </span>
+        <span class="ev">
+          <span class="name">{h.name}</span>
+          <span class="visually-hidden">, </span>
+          <span class="place">{h.place}</span>
+        </span>
+        {h.link ? (
+          <a
+            class="link"
+            href={h.link.href}
+            target="_blank"
+            rel="noopener"
+            aria-label={`${h.link.label} (nouvel onglet)`}
+          >
+            <Icon name="arrow-up-right" size={15} />
+          </a>
+        ) : (
+          <span aria-hidden="true" />
+        )}
+      </li>
+    ))}
+  </ol>
+</Tile>
+
+<style>
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .count {
+    color: var(--fg);
+  }
+
+  .log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr) 36px;
+    align-items: center;
+    gap: 16px;
+    min-height: 46px;
+    padding: 0 12px;
+    margin: 0 -12px;
+    border-radius: 10px;
+    background-image: linear-gradient(var(--line), var(--line));
+    background-size: calc(100% - 24px) 1px;
+    background-position: 12px 100%;
+    background-repeat: no-repeat;
+    transition: background-color 0.2s;
+  }
+
+  .row:last-child {
+    background-image: none;
+  }
+
+  .row:hover {
+    background-color: var(--bg-3);
+  }
+
+  .date {
+    color: var(--fg-2);
+    transition: color 0.2s;
+  }
+
+  .row:hover .date {
+    color: var(--accent-text);
+  }
+
+  .ev {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .name {
+    font-size: 15.5px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+
+  .place {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    white-space: nowrap;
+  }
+
+  .link {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    color: var(--fg-2);
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .link .ic {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .link:hover,
+  .link:focus-visible {
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .link:hover .ic {
+    transform: translate(1px, -1px);
+  }
+
+  @media (max-width: 620px), (pointer: coarse) {
+    .row {
+      grid-template-columns: 104px minmax(0, 1fr) 44px;
+    }
+
+    .link {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .head {
+      align-items: flex-start;
+    }
+
+    .row {
+      grid-template-columns: 72px minmax(0, 1fr) 44px;
+      gap: 12px;
+      min-height: 58px;
+      padding-block: 8px;
+    }
+
+    .ev {
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .place {
+      white-space: normal;
+    }
+  }
+</style>

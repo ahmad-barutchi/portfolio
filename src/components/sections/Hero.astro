@@ -1,0 +1,365 @@
+---
+/**
+ * Hero « SIGNAL » (#accueil) : halo d'ambiance, champ de points, nom en très
+ * grand (le <h1> de la page d'accueil), télémétrie façon HUD, filet avec paquet,
+ * phrase de position et deux CTA. Port de la maquette Main.dc.html.
+ */
+import Icon from '../Icon.astro';
+import SignalField from '../hero/SignalField.astro';
+import PacketRule from '../hero/PacketRule.astro';
+import { HERO, PROFILE, splitEmphasis } from '../../data/site';
+
+const status = PROFILE.availability ? PROFILE.availabilityLabel[PROFILE.availability] : null;
+const lede = splitEmphasis(HERO.ledeStrong);
+---
+
+<section id="accueil" class="hero" aria-label="Présentation">
+  <SignalField />
+
+  <div class="hero-inner">
+    <div class="name-block">
+      <h1 class="display">
+        <span class="mask">
+          <span class="rise">{PROFILE.firstName}</span>
+        </span>{' '}
+        <span class="mask indent">
+          <span class="rise rise-2">
+            {PROFILE.lastName}
+            <span class="dot-accent glow">.</span>
+          </span>
+        </span>
+      </h1>
+      <dl class="telemetry fade fade-3">
+        {status && (
+          <>
+            <dt>Statut</dt>
+            <dd>
+              <span class="beacon" aria-hidden="true" />
+              {status}
+            </dd>
+          </>
+        )}
+        <dt>Heure</dt>
+        <dd>
+          <span data-clock>--:--</span> · {PROFILE.city}
+        </dd>
+        <dt>
+          <abbr title="Coordonnées">Coord.</abbr>
+        </dt>
+        <dd>{PROFILE.coords}</dd>
+      </dl>
+    </div>
+
+    <PacketRule />
+
+    <div class="hero-foot">
+      <p class="lede fade fade-1">
+        <strong>
+          {lede.map((part) => (part.em ? <em class="serif">{part.text}</em> : part.text))}
+        </strong>{' '}
+        {HERO.ledeRest}
+      </p>
+      <div class="ctas fade fade-2">
+        <a class="btn btn-primary" href={HERO.primaryCta.href} data-magnetic>
+          {HERO.primaryCta.label}
+          <Icon name="arrow-down-right" />
+        </a>
+        <a
+          class="btn btn-ghost"
+          href={PROFILE.cv}
+          target="_blank"
+          rel="noopener"
+          aria-label="Télécharger le CV (PDF)"
+        >
+          <Icon name="download" />
+          {HERO.secondaryCta.label}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-cue" href="#a-propos">
+    <span class="mono">Défiler</span>
+    <span class="visually-hidden"> jusqu’à la section À propos</span>
+    <span class="cue-line" aria-hidden="true"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    --tick-top: 104px;
+    --tick-bottom: 44px;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: max(680px, 100svh);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 150px var(--gutter) 104px;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  .name-block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Nom : deux lignes qui montent chacune depuis un masque. */
+  .display {
+    font-weight: 600;
+    font-size: clamp(64px, 14vw, 224px);
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    color: var(--fg);
+  }
+
+  .mask {
+    display: block;
+    overflow: hidden;
+    padding: 0 0.06em 0.09em 0;
+    margin-bottom: -0.09em;
+  }
+
+  .indent {
+    padding-left: 0.62em;
+  }
+
+  .rise {
+    display: inline-block;
+    animation: hero-rise 1.15s var(--ease) 0.1s both;
+  }
+
+  .rise-2 {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes hero-rise {
+    from {
+      transform: translateY(108%);
+    }
+  }
+
+  /* Le point final est la balise : il pulse doucement. */
+  .glow {
+    animation: hero-glow 3.6s ease-in-out 1.4s infinite;
+  }
+
+  @keyframes hero-glow {
+    50% {
+      text-shadow: 0 0 0.22em color-mix(in oklch, var(--accent) 75%, transparent);
+    }
+  }
+
+  .fade {
+    animation: sig-fadeup 0.9s var(--ease) both;
+  }
+
+  .fade-1 {
+    animation-delay: 0.55s;
+  }
+
+  .fade-2 {
+    animation-delay: 0.68s;
+  }
+
+  .fade-3 {
+    animation-delay: 0.8s;
+  }
+
+  /* Télémétrie : alignée sur la première ligne du nom. */
+  .telemetry {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 50%;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-content: center;
+    gap: 11px 22px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .telemetry dt {
+    color: var(--fg-3);
+  }
+
+  .telemetry abbr {
+    text-decoration: none;
+  }
+
+  .telemetry dd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px 40px;
+  }
+
+  .lede {
+    max-width: 34ch;
+    font-size: clamp(18px, 1.6vw, 23px);
+    line-height: 1.5;
+    letter-spacing: -0.012em;
+    color: var(--fg-2);
+    text-wrap: pretty;
+  }
+
+  .lede strong {
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .btn {
+    white-space: nowrap;
+  }
+
+  /* translate : déplacement magnétique (voir magnetic.ts). */
+  .btn-primary {
+    transition:
+      translate 0.16s var(--ease),
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease),
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .btn-primary:hover :global(.ic) {
+    transform: translate(2px, 2px);
+  }
+
+  .btn-ghost:hover :global(.ic) {
+    transform: translateY(2px);
+  }
+
+  /* Indicateur de défilement. */
+  .scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    z-index: 2;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 44px;
+    text-decoration: none;
+  }
+
+  .scroll-cue .mono {
+    font-size: 10px;
+    line-height: 1.2;
+    transition: color 0.2s;
+  }
+
+  .scroll-cue:hover .mono {
+    color: var(--fg);
+  }
+
+  .cue-line {
+    position: relative;
+    width: 1px;
+    height: 34px;
+    background: var(--line-2);
+    overflow: hidden;
+  }
+
+  .cue-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -12px;
+    width: 1px;
+    height: 12px;
+    background: var(--accent);
+    animation: hero-cue 2.2s var(--ease) infinite;
+  }
+
+  @keyframes hero-cue {
+    to {
+      transform: translateY(48px);
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .telemetry {
+      position: static;
+      order: -1;
+      height: auto;
+      justify-content: start;
+      margin-bottom: 30px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .hero {
+      padding: 132px 20px 72px;
+    }
+
+    .display {
+      font-size: 21vw;
+    }
+
+    .indent {
+      padding-left: 0.22em;
+    }
+
+    .hero-inner {
+      gap: 34px;
+    }
+
+    .lede {
+      font-size: 18px;
+    }
+
+    .ctas {
+      width: 100%;
+    }
+
+    .btn {
+      flex: 1 1 140px;
+    }
+
+    .scroll-cue {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { magnetize } from '../hero/magnetic';
+
+  const host = document.getElementById('accueil');
+  host?.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => magnetize(el, host));
+</script>

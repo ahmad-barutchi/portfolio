@@ -1,0 +1,133 @@
+---
+/**
+ * Tuile vedette (2×2) : le robot secouriste. Le lien « Lire l’étude de cas »
+ * couvre toute la tuile (clic sur la capture compris) ; « Code source » reste
+ * cliquable au-dessus. La capture, inclinée en 3D, se redresse au survol et au
+ * focus, et porte le nom de transition de vue partagé avec l'étude de cas.
+ */
+import Tile from './Tile.astro';
+import Icon from '../Icon.astro';
+import DashboardFrame from '../DashboardFrame.astro';
+import { FEATURED_PROJECT as P } from '../../data/site';
+import { caseImage, COVER_NAME } from '../../lib/case-images';
+
+const cover = caseImage(COVER_NAME);
+---
+
+<Tile variant="feature" aria-labelledby="projet-robot-titre">
+  <div class="top">
+    <p class="mono">{P.meta}</p>
+    <span class="badge">{P.badge}</span>
+  </div>
+
+  <div class="copy">
+    <h3 id="projet-robot-titre" class="h3-xl" style="view-transition-name: projet-robot-titre">
+      {P.titleStart} <em class="serif">{P.titleEm}</em>
+    </h3>
+    <p class="body">{P.summary}</p>
+    <ul class="chips" aria-label="Technologies">
+      {P.stack.map((tech) => (
+        <li>{tech}</li>
+      ))}
+    </ul>
+    <div class="links">
+      <a class="link-accent case-link" href={P.href}>
+        Lire l’étude de cas<span class="visually-hidden"> : {P.title}</span>
+        <Icon name="arrow-right" size={16} />
+      </a>
+      <a class="link-quiet src-link" href={P.repo} target="_blank" rel="noopener">
+        Code source
+        <span class="visually-hidden"> du robot secouriste sur GitHub (nouvel onglet)</span>
+        <Icon name="arrow-up-right" size={15} />
+      </a>
+    </div>
+  </div>
+
+  <div class="shot-zone" aria-hidden="true">
+    <div class="shot">
+      <DashboardFrame
+        image={cover}
+        alt=""
+        transitionName="projet-robot"
+        sizes="(min-width: 1440px) 710px, (min-width: 981px) 53vw, 110vw"
+      />
+    </div>
+  </div>
+</Tile>
+
+<style>
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 31rem;
+    margin-top: 22px;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+    margin-top: 6px;
+  }
+
+  /* Lien étiré : toute la tuile mène à l'étude de cas. */
+  .case-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+
+  .src-link {
+    position: relative;
+    z-index: 3;
+  }
+
+  .shot-zone {
+    position: relative;
+    z-index: 0;
+    flex: 1 1 auto;
+    min-height: 200px;
+    margin: 22px -30px -30px 0;
+  }
+
+  .shot {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 118%;
+    transform: perspective(1500px) rotateX(16deg) rotateY(-12deg) rotateZ(2.5deg);
+    transform-origin: 0 0;
+    transition: transform 0.9s var(--ease);
+  }
+
+  :global(.tile:hover) .shot,
+  :global(.tile:focus-within) .shot {
+    transform: perspective(1500px) rotateX(4deg) rotateY(-3deg) rotateZ(0deg) translateY(-14px);
+  }
+
+  @media (max-width: 620px), (pointer: coarse) {
+    .links a {
+      min-height: 44px;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .copy {
+      margin-top: 18px;
+    }
+
+    .shot-zone {
+      margin: 18px -22px -22px 0;
+      min-height: 210px;
+    }
+  }
+</style>

@@ -1,0 +1,25 @@
+# Build
+dist/
+.astro/
+
+# Dépendances
+node_modules/
+
+# Firebase
+.firebase/
+firebase-debug.log*
+
+# Tests
+test-results/
+playwright-report/
+blob-report/
+
+# Divers
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.vscode/*
+!.vscode/extensions.json
+.idea/

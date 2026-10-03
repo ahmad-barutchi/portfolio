@@ -1,0 +1,134 @@
+---
+/**
+ * Fond « SIGNAL » : halo d'ambiance CSS, champ de points <canvas> et quatre
+ * croix de repère. À placer comme premier enfant d'un hôte
+ * position: relative; overflow: hidden; isolation: isolate.
+ * L'hôte règle la position des croix avec --tick-top et --tick-bottom
+ * (l'axe horizontal suit la gouttière et le conteneur).
+ */
+interface Props {
+  /** Le champ réagit au pointeur (effet loupe). */
+  interactive?: boolean;
+  /** Affiche les croix de repère aux coins de la zone de contenu. */
+  ticks?: boolean;
+}
+
+const { interactive = true, ticks = true } = Astro.props;
+---
+
+<div class="halo" aria-hidden="true"></div>
+<canvas
+  class="field"
+  aria-hidden="true"
+  data-signal-field
+  data-interactive={String(interactive)}
+></canvas>
+{ticks && (
+  <>
+    <span class="tick tick-tl" aria-hidden="true" />
+    <span class="tick tick-tr" aria-hidden="true" />
+    <span class="tick tick-bl" aria-hidden="true" />
+    <span class="tick tick-br" aria-hidden="true" />
+  </>
+)}
+
+<style>
+  /* Deux dégradés radiaux très larges, sans filter: blur (coûteux sur mobile). */
+  .halo {
+    position: absolute;
+    inset: -25%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(38% 48% at 22% 78%, var(--halo-a), transparent 70%),
+      radial-gradient(42% 52% at 82% 18%, var(--halo-b), transparent 70%);
+    animation: signal-drift 38s ease-in-out infinite alternate;
+  }
+
+  @keyframes signal-drift {
+    to {
+      transform: translate3d(5%, -4%, 0) scale(1.06);
+    }
+  }
+
+  .field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 98%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 98%);
+  }
+
+  /* Croix de repère : aux coins de la zone de contenu (gouttière ou conteneur centré). */
+  .tick {
+    --tick-x: calc(max(var(--gutter), (100% - var(--container)) / 2) - 5px);
+    position: absolute;
+    z-index: 1;
+    width: 11px;
+    height: 11px;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .tick::before,
+  .tick::after {
+    content: '';
+    position: absolute;
+    background: var(--fg-3);
+  }
+
+  .tick::before {
+    left: 5px;
+    top: 0;
+    width: 1px;
+    height: 11px;
+  }
+
+  .tick::after {
+    left: 0;
+    top: 5px;
+    width: 11px;
+    height: 1px;
+  }
+
+  .tick-tl,
+  .tick-tr {
+    top: var(--tick-top, 104px);
+  }
+
+  .tick-bl,
+  .tick-br {
+    bottom: var(--tick-bottom, 44px);
+  }
+
+  .tick-tl,
+  .tick-bl {
+    left: var(--tick-x);
+  }
+
+  .tick-tr,
+  .tick-br {
+    right: var(--tick-x);
+  }
+
+  @media (max-width: 820px) {
+    .tick {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { initSignalField } from '../../scripts/signal-field';
+
+  document.querySelectorAll<HTMLCanvasElement>('canvas[data-signal-field]').forEach((canvas) => {
+    const host = canvas.parentElement;
+    if (host) {
+      initSignalField(canvas, host, { interactive: canvas.dataset.interactive !== 'false' });
+    }
+  });
+</script>
